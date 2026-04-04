@@ -863,7 +863,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <div class="f-row"><span class="f-name">Length (calibers):</span><span class="f-eq">lc = L / D</span></div>
       <div class="f-row"><span class="f-name">Sg (uncorrected):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc·(1+lc²))</span></div>
       <div class="f-row"><span class="f-name">Velocity factor:</span><span class="f-eq">fv = (v / 2800)^(1/3)  &nbsp;[v in fps]</span></div>
-      <div class="f-row"><span class="f-name">Atm. correction:</span><span class="f-eq">f_atm = √( (760/P_mmHg) · (T_K/288.15) )</span></div>
+      <div class="f-row"><span class="f-name">Atm. correction *:</span><span class="f-eq">f_atm = √( (760/P_mmHg) · (T_K/288.15) )</span></div>
       <div class="f-row"><span class="f-name">Sg (corrected):</span><span class="f-eq">Sg = Sg₀ · fv · f_atm</span></div>
       <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
       <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
@@ -874,6 +874,8 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       Miller, D.G. (2009). <em>How Good Are Simple Rules for Estimating Rifle Twist.</em> Precision Shooting.<br>
       Litz, B. (2015). <em>How Ballistic Coefficient Varies with Twist Rate.</em> Applied Ballistics.<br>
       Validated against <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank">Berger Twist Rate Calculator</a>.
+      <br><br>
+      <span style="font-size:12px;">* Miller's original formula uses the linear atmospheric correction (P_std/P · T/T_std). This calculator implements the square root form √(P_std/P · T/T_std), consistent with JBM and Berger, which yields better empirical agreement in practice.</span>
       <br><br>
       <span style="color:var(--muted);font-size:13px;">Last updated: April 3, 2026</span>
       <br><br>

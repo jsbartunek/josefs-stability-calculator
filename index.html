@@ -776,7 +776,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
 
     </div>
   </div>
-  <div id="flatbase-note" style="display:none;margin-top:14px;font-size:13px;color:var(--orange);line-height:1.5;">Note: The Miller formula is conservative for flat-base and round-nose bullets — it may suggest a faster twist rate than strictly necessary in practice, but will not underestimate stability requirements.</div>
+  <div id="flatbase-note" style="display:none;margin-top:14px;font-size:13px;color:var(--orange);line-height:1.5;">Note: The Miller formula underestimates Sg for flat-base and round-nose bullets, causing it to suggest a faster twist rate than necessary. Based on empirical comparison with Berger's published minimum twist rates for 13 flat-base bullets (.17 to .30 cal), Miller overestimates the required twist by approximately 1–3", equivalent to an Sg underestimate of ~21%. The calculated Sg should be read as conservative — actual stability is likely higher. See the formula reference section below for details.</div>
   <div style="margin-top:16px;">
     <button class="calc-btn" onclick="calculate()">CALCULATE STABILITY</button>
   </div>
@@ -876,6 +876,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <div class="f-row"><span class="f-name">Sg (corrected):</span><span class="f-eq">Sg = Sg₀ · fv · f_atm</span></div>
       <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
       <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
+      <div class="f-row"><span class="f-name">Sg (flat-base †):</span><span class="f-eq">Sg_corrected ≈ Sg × 1.21</span></div>
     </div>
     <div class="refs">
       <strong style="color:var(--text);">References:</strong><br>
@@ -883,6 +884,8 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       Miller, D.G. (2009). <em>How Good Are Simple Rules for Estimating Rifle Twist.</em> Precision Shooting.<br>
       Litz, B. (2015). <em>How Ballistic Coefficient Varies with Twist Rate.</em> Applied Ballistics.<br>
       Validated against <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank">Berger Twist Rate Calculator</a>.
+      <br><br>
+      <span style="font-size:12px;">† <strong>Flat-base correction:</strong> Miller's denominator (1 + lc²) is empirically calibrated for boat-tail bullet geometry. For flat-base bullets, the aerodynamic overturning moment (C<sub>Mα</sub>) is lower, meaning actual gyroscopic stability is higher than Miller predicts. Comparison of Miller's minimum twist estimates against Berger Bullets' published minimum twist rates for 13 flat-base bullets (.17 to .30 caliber) shows Miller consistently requires 1–3" faster twist than Berger's empirical data, corresponding to an Sg underestimate of approximately 21% (ratio range 1.10–1.29, mean 1.21). The corrected estimate Sg × 1.21 is therefore a reasonable first-order approximation, but individual bullets may deviate. For critical applications, consult manufacturer data.</span>
       <br><br>
       <span style="font-size:12px;">* Miller's original formula uses the linear atmospheric correction (P_std/P · T/T_std). This calculator implements the square root form √(P_std/P · T/T_std), consistent with JBM and Berger, which yields better empirical agreement in practice.</span>
       <br><br>

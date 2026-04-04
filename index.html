@@ -903,6 +903,59 @@ let lastParams = null;
 let atmChart   = null;
 
 // ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+//  SAVE / RESTORE USER INPUTS (localStorage)
+// ─────────────────────────────────────────────
+const BSC_INPUTS = [
+  'caliber','caliber-unit',
+  'bullet-len','bullet-len-unit',
+  'bullet-wt','bullet-wt-unit',
+  'bc-g1','bc-g7','bullet-type',
+  'twist','twist-unit',
+  'mv','mv-unit',
+  'temp','temp-unit',
+  'press','press-unit',
+  't-min','t-max','p-min','p-max'
+];
+
+function saveInputs() {
+  var data = {};
+  BSC_INPUTS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  localStorage.setItem('bsc-inputs', JSON.stringify(data));
+}
+
+function restoreInputs() {
+  var raw = localStorage.getItem('bsc-inputs');
+  if (!raw) return;
+  try {
+    var data = JSON.parse(raw);
+    BSC_INPUTS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && data[id] !== undefined) el.value = data[id];
+    });
+    // Trigger flatbase note if needed
+    var bt = document.getElementById('bullet-type');
+    if (bt) {
+      var note = document.getElementById('flatbase-note');
+      if (note) note.style.display = (bt.value === '4' || bt.value === '5') ? 'block' : 'none';
+    }
+  } catch(e) {}
+}
+
+// Attach save listener to all inputs
+document.addEventListener('DOMContentLoaded', function() {
+  restoreInputs();
+  BSC_INPUTS.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('change', saveInputs);
+    if (el && el.tagName === 'INPUT') el.addEventListener('input', saveInputs);
+  });
+});
+
 //  THEME TOGGLE — light is default
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {

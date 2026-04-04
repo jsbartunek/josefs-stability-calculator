@@ -1480,6 +1480,15 @@ function updateAtmMap() {
   function dispToC(t)    { return usingF    ? (t - 32) / 1.8 : t; }
   function dispToHpa(p)  { return usingInHg ? p * 33.8639    : p; }
 
+  // Update section label with correction note
+  const atmLabel = document.querySelector('#atm-section .section-label');
+  if (atmLabel) {
+    const tag = btype === '4' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(corrected)</span>'
+              : btype === '5' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(uncorrected)</span>'
+              : '';
+    atmLabel.innerHTML = '03 — Atmospheric Stability Map' + tag;
+  }
+
   const nT = 30, nP = 20;
   const tempsD = Array.from({length:nT}, (_,i) => tMinD + i*(tMaxD-tMinD)/(nT-1));
   const pressD = Array.from({length:nP}, (_,i) => pMinD + i*(pMaxD-pMinD)/(nP-1));
@@ -1489,8 +1498,10 @@ function updateAtmMap() {
     for (let ti = 0; ti < nT; ti++) {
       const t_c  = dispToC(tempsD[ti]);
       const p_hp = dispToHpa(pressD[pi]);
-      const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype);
-      heatData.push({ x: tempsD[ti], y: pressD[pi], sg: r.Sg });
+      const r    = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype);
+      const sgRaw = r.Sg;
+      const sgPlot = (btype === '4') ? sgRaw * 1.15 : sgRaw;
+      heatData.push({ x: tempsD[ti], y: pressD[pi], sg: sgPlot });
     }
   }
 

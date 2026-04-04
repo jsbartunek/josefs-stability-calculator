@@ -1205,7 +1205,7 @@ function calculate() {
   const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7, btype);
   lastParams = { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa };
 
-  renderSgScale(r.Sg);
+  renderSgScale(r.Sg, btype);
   renderResults(r, units);
   renderDriftTable(r.drift);
   updateAtmMap();
@@ -1219,24 +1219,29 @@ function calculate() {
 // ─────────────────────────────────────────────
 //  Sg SCALE
 // ─────────────────────────────────────────────
-function renderSgScale(Sg) {
+function renderSgScale(Sg, btype) {
   const maxSg = 3.0;
-  const pct   = Math.min(Math.max(Sg / maxSg, 0), 1) * 100;
   const arrow = document.getElementById('sg-arrow');
   const label = document.getElementById('sg-val-lbl');
-  const bar   = document.getElementById('sg-bar');
 
+  // For flat-base, show arrow at corrected Sg
+  const isFlatBase = (btype === '4');
+  const SgDisplay = isFlatBase ? Sg * 1.15 : Sg;
+
+  const pct = Math.min(Math.max(SgDisplay / maxSg, 0), 1) * 100;
   arrow.style.left = pct + '%';
   label.style.left = pct + '%';
-  label.textContent = 'Sg = ' + Sg.toFixed(4);
+  label.innerHTML = 'Sg = ' + SgDisplay.toFixed(4)
+    + (isFlatBase ? ' <span id="sg-corrected-lbl" style="font-size:11px;color:var(--muted);font-weight:400;">(corrected)</span>' : '');
 
   let hexCol;
-  if (Sg >= 1.5)      hexCol = '#4caf7d';
-  else if (Sg >= 1.3) hexCol = '#e8943a';
-  else                hexCol = '#e05a5a';
+  if (SgDisplay >= 1.5)      hexCol = '#4caf7d';
+  else if (SgDisplay >= 1.3) hexCol = '#e8943a';
+  else                       hexCol = '#e05a5a';
 
   label.style.color = hexCol;
   arrow.style.borderTopColor = hexCol;
+
 }
 
 // ─────────────────────────────────────────────

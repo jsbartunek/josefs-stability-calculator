@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Josef's Stability Calculator — Miller Twist Rule</title>
+<meta name="description" content="Free online bullet stability calculator based on the Miller Twist Rule. Calculate gyroscopic stability factor (Sg), optimal twist rate, BC degradation and spin drift for any bullet and rifle combination.">
+<meta name="keywords" content="twist rate calculator, bullet stability, Miller twist rule, gyroscopic stability factor, Sg, handloading, reloading, ballistics, spin drift, BC degradation, rifling twist, barrel twist">
+<meta name="author" content="Josef">
+<meta property="og:title" content="Josef's Stability Calculator">
+<meta property="og:description" content="Free bullet stability calculator based on the Miller Twist Rule. Calculate Sg, optimal twist rate, BC degradation and spin drift.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Josef's Stability Calculator">
+<meta name="twitter:description" content="Free bullet stability calculator based on the Miller Twist Rule. Calculate Sg, optimal twist rate, BC degradation and spin drift.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230d0f12' stroke='%23e8c36a' stroke-width='2'/><circle cx='16' cy='16' r='5' fill='none' stroke='%23e8c36a' stroke-width='2'/><line x1='16' y1='2' x2='16' y2='9' stroke='%23e8c36a' stroke-width='2'/><line x1='16' y1='23' x2='16' y2='30' stroke='%23e8c36a' stroke-width='2'/><line x1='2' y1='16' x2='9' y2='16' stroke='%23e8c36a' stroke-width='2'/><line x1='23' y1='16' x2='30' y2='16' stroke='%23e8c36a' stroke-width='2'/></svg>">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    /* Semantic colours — overridden per theme */
+    --green:  #2e9e64;
+    --orange: #d4791e;
+    --red:    #c94040;
+  }
+
+  /* ── DARK theme (default) ── */
+  :root, [data-theme="dark"] {
+    --bg:      #0d0f12;
+    --surface: #13161b;
+    --border:  #252a32;
+    --border2: #1e2229;
+    --text:    #c8cdd6;
+    --muted:   #5a6172;
+    --accent:  #e8c36a;
+    --accent2: #4fc3f7;
+    --btn-fg:  #0d0f12;
+    --green:   #4caf7d;
+    --orange:  #e8943a;
+    --red:     #e05a5a;
+    --input-bg:#0d0f12;
+  }
+
+  /* ── LIGHT theme ── */
+  [data-theme="light"] {
+    --bg:      #f4f5f7;
+    --surface: #ffffff;
+    --border:  #d4d8df;
+    --border2: #e2e5ea;
+    --text:    #1e2229;
+    --muted:   #606878;
+    --accent:  #b07c10;
+    --accent2: #1a7fb5;
+    --btn-fg:  #ffffff;
+    --green:   #2e9e64;
+    --orange:  #c96a10;
+    --red:     #c03030;
+    --input-bg:#f9fafb;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .header-spacer { flex: 1; min-width: 8px; }
+  @media (max-width: 480px) {
+    header h1 { font-size: 15px; }
+    header { padding: 12px 16px; gap: 8px; }
+  }
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px 5px 8px;
+    background: var(--bg);
+    transition: border-color 0.15s;
+  }
+  .theme-toggle:hover { border-color: var(--accent2); color: var(--text); }
+  .toggle-track {
+    width: 32px; height: 16px;
+    border-radius: 8px;
+    background: var(--border);
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle-track.on { background: var(--accent2); }
+  .toggle-knob {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 2px; left: 2px;
+    transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .toggle-track.on .toggle-knob { left: 18px; }
+  header h1 {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  header p {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Main layout ── */
+  main { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; }
+  @media (max-width: 480px) { main { padding: 16px 12px 48px; } }
+
+  section { margin-bottom: 32px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 6px;
+  }
+
+  /* ── Input grid ── */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 680px) { .input-grid { grid-template-columns: 1fr; } }
+
+  .input-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .field {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+  }
+  @media (max-width: 480px) {
+    .field { grid-template-columns: 1fr auto auto; gap: 6px; }
+    .field input[type="text"] { width: 68px; font-size: 13px; }
+    .field-label { font-size: 13px; }
+  }
+  .field-label {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .field-label span { color: var(--muted); font-size: 15px; }
+
+  input[type="number"], input[type="text"], select {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 15px;
+    padding: 6px 10px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 110px;
+    text-align: right;
+  }
+  input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  select {
+    width: auto;
+    text-align: left;
+    padding: 6px 8px;
+    cursor: pointer;
+    background-image: none;
+  }
+  .unit-label {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--border2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 10px;
+    text-align: center;
+    min-width: 44px;
+  }
+  select option { background: var(--surface); }
+
+  /* ── Tooltip ── */
+  .tip-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .tip-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .tip-btn .tip-box {
+    display: none;
+    position: absolute;
+    left: 26px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 4px;
+    width: 300px;
+    z-index: 100;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .tip-btn .tip-box code {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    background: rgba(232,195,106,0.08);
+    padding: 1px 4px;
+    border-radius: 2px;
+    word-break: break-all;
+  }
+  .tip-btn:hover .tip-box { display: block; }
+  @media (max-width: 600px) {
+    .tip-btn .tip-box {
+      left: auto;
+      right: auto;
+      top: 28px;
+      transform: none;
+      width: min(260px, 80vw);
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ── Bullet type select ── */
+  .full-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+  .full-row select { width: auto; }
+
+  /* ── Button ── */
+  .calc-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: var(--btn-fg);
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .calc-btn:hover { opacity: 0.88; }
+  .calc-btn:active { transform: scale(0.99); }
+
+  /* ── Sg scale ── */
+  #sg-scale-wrap {
+    display: none;
+    margin-bottom: 32px;
+  }
+  .sg-scale-bar {
+    position: relative;
+    height: 28px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+    overflow: visible;
+    background: transparent;
+    display: flex;
+  }
+  .sg-seg-red    { background: #e05a5a; width: 43.333%; border-radius: 3px 0 0 3px; flex-shrink: 0; }
+  .sg-seg-orange { background: #e8943a; width: 6.667%;  flex-shrink: 0; }
+  .sg-seg-green  { background: #4caf7d; flex: 1;        border-radius: 0 3px 3px 0; }
+  .sg-labels {
+    position: relative;
+    height: 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .sg-labels span {
+    position: absolute;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  @media (max-width: 480px) {
+    .sg-labels { font-size: 10px; }
+    .sg-labels span:nth-child(2), .sg-labels span:nth-child(3) { display: none; }
+  }
+  .sg-arrow {
+    position: absolute;
+    top: -16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid white;
+    transform: translateX(-50%);
+    transition: left 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .sg-value-label {
+    position: absolute;
+    top: -40px;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    transition: left 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* ── Summary block ── */
+  .summary-block {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  @media (max-width: 600px) { .summary-block { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .sum-group { border-right: none !important; } }
+  .sum-group {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .sum-group:nth-child(odd) { border-right: 1px solid var(--border2); }
+  .sum-group:last-child,
+  .sum-group:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .sum-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 0 10px;
+    padding: 3px 0;
+    border-bottom: 1px dotted var(--border2);
+  }
+  .sum-row:last-child { border-bottom: none; }
+  .sum-key  { color: var(--muted); white-space: nowrap; }
+  .sum-note { color: var(--muted); font-weight: 400; font-size: 13px; text-align: right; }
+  .sum-val  { color: var(--text); font-weight: 600; text-align: right; white-space: nowrap; }
+  .sum-val.green  { color: var(--green); }
+  .sum-val.orange { color: var(--orange); }
+  .sum-val.red    { color: var(--red); }
+  .sum-group-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--accent2);
+  }
+
+  /* ── Detail toggle ── */
+  #results-detail-toggle:hover { color: var(--accent2); background: var(--border2); }
+
+  /* ── Results grid (detail) ── */
+  #results-box {
+    display: none;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .results-header {
+    word-break: break-word;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .results-header.green  { background: rgba(76,175,125,0.15); color: var(--green); border-bottom: 1px solid rgba(76,175,125,0.3); }
+  .results-header.orange { background: rgba(232,148,58,0.15);  color: var(--orange); border-bottom: 1px solid rgba(232,148,58,0.3); }
+  .results-header.red    { background: rgba(224,90,90,0.15);   color: var(--red); border-bottom: 1px solid rgba(224,90,90,0.3); }
+
+  @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr 1fr; } }
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    padding: 16px;
+    gap: 16px;
+  }
+  .result-item { display: flex; flex-direction: column; gap: 2px; }
+  .result-item .r-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .result-item .r-val {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .result-item .r-sub {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .result-item .r-val.green  { color: var(--green); }
+  .result-item .r-val.orange { color: var(--orange); }
+  .result-item .r-val.red    { color: var(--red); }
+
+  /* ── Chart wrappers ── */
+  .chart-wrap {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    background: var(--surface);
+  }
+  canvas { display: block; }
+
+  /* ── Drift table ── */
+  #drift-section { display: none; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--border2);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--border2); }
+
+  /* ── Formulas footer ── */
+  .formulas {
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 20px 24px;
+    background: var(--surface);
+  }
+  .formulas h3 {
+    font-family: var(--mono);
+    font-size: 15px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .formula-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text);
+  }
+  .formula-block .f-row { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .formula-block .f-name { color: var(--muted); min-width: 120px; font-size: 15px; }
+  .formula-block .f-eq   { color: var(--accent); }
+  .refs { margin-top: 14px; font-size: 15px; color: var(--muted); line-height: 1.8; }
+  .refs a { color: var(--accent2); text-decoration: none; }
+
+  /* ── Atmosphere range controls ── */
+  .atm-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    row-gap: 6px;
+  }
+  .atm-controls label { display: flex; align-items: center; gap: 6px; }
+  .atm-controls input[type="text"] { width: 60px; font-size: 15px; padding: 4px 6px; }
+  @media (max-width: 600px) {
+    .atm-controls { gap: 6px; font-size: 12px; flex-wrap: wrap; }
+    .atm-controls input[type="text"] { width: 44px; font-size: 12px; }
+    .atm-controls .calc-btn { font-size: 11px !important; padding: 4px 10px !important; }
+  }
+
+  #atm-section { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <h1>⦿ JOSEF'S STABILITY CALCULATOR</h1>
+    <p style="font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:0.03em;">Gyroscopic stability &amp; spin drift · Miller Twist Rule</p>
+  </div>
+  <button onclick="document.getElementById('about-modal').style.display='flex'" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:5px 14px;border-radius:20px;cursor:pointer;letter-spacing:0.06em;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent2)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">ABOUT</button>
+  <div class="header-spacer"></div>
+  <div class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
+    <div class="toggle-track" id="toggle-track">
+      <div class="toggle-knob"></div>
+    </div>
+    <span id="theme-label">Light mode</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ── 1. INPUT FORM ── -->
+<section>
+  <div class="section-label">01 — Parameters</div>
+  <div class="input-grid">
+
+    <!-- LEFT: Bullet -->
+    <div class="input-group">
+      <div class="section-label" style="border:none;margin-bottom:2px;">Bullet</div>
+
+      <div class="field">
+        <div class="field-label">
+          Caliber
+          <button class="tip-btn">?<div class="tip-box"><b>Caliber — Bullet diameter</b><br>
+The bore diameter of the barrel, equal to the bullet's nominal diameter.<br>
+Used internally as <i>d</i> (inches) in all stability calculations.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="caliber" value="0.308" step="0.001" min="0.1">
+        <select id="caliber-unit"   onchange="convertField('caliber',   this)">
+          <option value="inch" selected>inch</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          Bullet length
+          <button class="tip-btn">?<div class="tip-box"><b>Bullet Length</b><br>
+Total length from tip to base of the bullet.<br>
+Converted to calibers: <i>l = L / d</i><br>
+Longer bullets require faster twist rates to stabilize.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="bullet-len" value="1.299" step="0.001" min="0.1">
+        <select id="bullet-len-unit" onchange="convertField('bullet-len', this)">
+          <option value="inch" selected>inch</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          Bullet weight
+          <button class="tip-btn">?<div class="tip-box"><b>Bullet Weight</b><br>
+Total mass of the bullet.<br>
+Used as <i>m</i> (grains) in the Miller formula.<br>
+Heavier bullets generally require faster twist to stabilize.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="bullet-wt" value="165" step="0.1" min="1">
+        <select id="bullet-wt-unit"  onchange="convertField('bullet-wt',  this)">
+          <option value="gr" selected>gr</option>
+          <option value="g">g</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          G1 BC
+          <button class="tip-btn">?<div class="tip-box"><b>Ballistic Coefficient — G1 model</b><br>
+Measures how well the bullet retains velocity against drag, referenced to a standard G1 projectile.<br>
+Used to estimate BC degradation when Sg &lt; 1.5:<br>
+<code>BC_eff = BC × max(0, 1 − (1.5 − Sg) × 0.30)</code></div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="bc-g1" value="0.447" step="0.001" min="0.05" max="1.5">
+        <span class="unit-label">G1</span>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          G7 BC
+          <button class="tip-btn">?<div class="tip-box"><b>Ballistic Coefficient — G7 model</b><br>
+More accurate drag model for long, boat-tail bullets. Leave as 0 to auto-estimate from G1 using the bullet-type conversion factor.<br>
+Not applicable for flat-base or round-nose bullets.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="bc-g7" value="0" step="0.001" min="0" max="1.0">
+        <span class="unit-label">G7</span>
+      </div>
+
+      <div class="field" style="grid-template-columns:1fr auto;">
+        <div class="field-label">
+          Bullet type
+          <button class="tip-btn">?<div class="tip-box"><b>Bullet Type — G1→G7 factor</b><br>
+Used only when G7 BC = 0 (auto-estimate).<br>
+<code>BC_G7 = BC_G1 / factor</code><br><br>
+<span style="display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13px;">
+<span>Pointed BT polymer tip</span><span style="text-align:right;color:var(--accent);">1.52</span>
+<span>Pointed long BT (VLD/Hybrid)</span><span style="text-align:right;color:var(--accent);">1.43</span>
+<span>Pointed BT softpoint</span><span style="text-align:right;color:var(--accent);">1.60</span>
+<span>Flat base</span><span style="text-align:right;color:var(--muted);">N/A</span>
+<span>Round nose</span><span style="text-align:right;color:var(--muted);">N/A</span>
+</span></div></button>
+        </div>
+        <select id="bullet-type" style="width:auto;text-align:left;">
+          <option value="1">Pointed BT polymer tip</option>
+          <option value="2">Pointed long BT (VLD/Hybrid)</option>
+          <option value="3">Pointed BT softpoint</option>
+          <option value="4">Flat base</option>
+          <option value="5">Round nose</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RIGHT: Gun & Atmosphere -->
+    <div class="input-group">
+      <div class="section-label" style="border:none;margin-bottom:2px;">Gun &amp; Atmosphere</div>
+
+      <div class="field">
+        <div class="field-label">
+          Twist rate
+          <button class="tip-btn">?<div class="tip-box"><b>Twist Rate</b><br>
+Barrel rifling: distance travelled for one full bullet rotation.<br>
+Faster twist (lower number) = more spin = higher Sg.<br>
+Used as <i>t = twist / d</i> (calibers/turn) in the Miller formula.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="twist" value="12.0" step="0.25" min="4">
+        <select id="twist-unit"      onchange="convertField('twist',      this)">
+          <option value="inch" selected>in/turn</option>
+          <option value="mm">mm/turn</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          Muzzle velocity
+          <button class="tip-btn">?<div class="tip-box"><b>Muzzle Velocity</b><br>
+Bullet speed at the muzzle.<br>
+Velocity correction factor: <code>fv = (v / 2800)^(1/3)</code><br>
+Higher velocity increases Sg. Reference velocity is 2800 fps.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="mv" value="2625" step="10" min="500">
+        <select id="mv-unit"         onchange="convertField('mv',         this)">
+          <option value="fps" selected>fps</option>
+          <option value="ms">m/s</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          Temperature
+          <button class="tip-btn">?<div class="tip-box"><b>Temperature</b><br>
+Ambient air temperature at the shooting location.<br>
+Part of atmospheric correction:<br>
+<code>f_atm = √( (760/P) × (T_K / 288.15) )</code><br>
+Higher temperature → lower air density → higher Sg.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="temp" value="59" step="1">
+        <select id="temp-unit"       onchange="convertField('temp',       this)">
+          <option value="C">°C</option>
+          <option value="F" selected>°F</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          Pressure
+          <button class="tip-btn">?<div class="tip-box"><b>Atmospheric Pressure</b><br>
+Station pressure at shooting location (not sea-level corrected).<br>
+Part of atmospheric correction:<br>
+<code>f_atm = √( (760/P_mmHg) × (T_K / 288.15) )</code><br>
+Lower pressure (high altitude) → lower air density → higher Sg.</div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="press" value="29.92" step="0.01" min="23.0" max="32.5">
+        <select id="press-unit"      onchange="convertField('press',      this)">
+          <option value="hPa">hPa</option>
+          <option value="inHg" selected>inHg</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+  <div style="margin-top:16px;">
+    <button class="calc-btn" onclick="calculate()">CALCULATE STABILITY</button>
+  </div>
+</section>
+
+<!-- ── 2. Sg SCALE ── -->
+<section id="sg-scale-wrap">
+  <div class="section-label">02 — Gyroscopic Stability Factor</div>
+  <div class="chart-wrap" style="padding:52px 24px 20px;">
+    <div style="position:relative;margin-bottom:4px;">
+      <div class="sg-value-label" id="sg-val-lbl">Sg = —</div>
+      <div class="sg-arrow" id="sg-arrow"></div>
+    </div>
+    <div class="sg-scale-bar" id="sg-bar"><div class="sg-seg-red"></div><div class="sg-seg-orange"></div><div class="sg-seg-green"></div></div>
+    <div class="sg-labels"><span style="left:0.000%">0.0</span><span style="left:16.667%">0.5</span><span style="left:33.333%">1.0</span><span style="left:43.333%">1.3</span><span style="left:50.000%">1.5</span><span style="left:66.667%">2.0</span><span style="left:83.333%">2.5</span><span style="left:100.000%">3.0+</span></div>
+    <div style="font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;">
+      <span style="color:var(--red)">■ Sg &lt; 1.3 — Unstable</span>
+      <span style="color:var(--orange)">■ 1.3 ≤ Sg &lt; 1.5 — Marginal</span>
+      <span style="color:var(--green)">■ Sg ≥ 1.5 — Stable</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 3. RESULTS BOX ── -->
+<section>
+  <div id="results-box">
+    <div class="results-header" id="results-hdr">—</div>
+    <div id="results-summary"></div>
+    <div id="results-detail-toggle" onclick="toggleDetail()" style="display:none;cursor:pointer;padding:8px 16px;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;color:var(--muted);border-top:1px solid var(--border2);align-items:center;gap:6px;">
+      <span id="detail-arrow">▶</span>&ensp;<span id="detail-label">SHOW DETAILED PARAMETERS</span>
+    </div>
+    <div class="results-grid" id="results-grid" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- ── 4. ATMOSPHERIC MAP ── -->
+<section id="atm-section">
+  <div class="section-label">03 — Atmospheric Stability Map</div>
+  <div class="chart-wrap">
+    <div class="atm-controls">
+      <span>Temperature range:</span>
+      <label>from <input type="text" inputmode="decimal" id="t-min" value="-4" style="width:60px;"> <span id="t-unit-lbl">°F</span></label>
+      <label>to <input type="text" inputmode="decimal" id="t-max" value="104" style="width:60px;"> <span id="t-unit-lbl2">°F</span></label>
+      <span style="margin-left:16px;">Pressure range:</span>
+      <label>from <input type="text" inputmode="decimal" id="p-min" value="28.1" style="width:70px;"> <span id="p-unit-lbl">inHg</span></label>
+      <label>to <input type="text" inputmode="decimal" id="p-max" value="31.0" style="width:70px;"> <span id="p-unit-lbl2">inHg</span></label>
+      <button class="calc-btn" style="width:auto;padding:5px 14px;font-size:13px;margin-top:0;flex-shrink:0;margin-left:auto;" onclick="updateAtmMap()">UPDATE MAP</button>
+    </div>
+    <canvas id="atm-chart" height="280"></canvas>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:14px;color:var(--muted);display:flex;gap:24px;flex-wrap:wrap;">
+      <span style="display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:14px;"><span style="color:#e05a5a;">● Sg &lt; 1.3 — Unstable</span><span style="color:#e8943a;">● 1.3 ≤ Sg &lt; 1.5 — Marginal</span><span style="color:#4caf7d;">● Sg ≥ 1.5 — Stable</span><span style="color:#4fc3f7;">★ Current conditions</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ── 5. SPIN DRIFT TABLE ── -->
+<section id="drift-section">
+  <div class="section-label">04 — Spin Drift (Right-hand twist)</div>
+  <div class="chart-wrap" style="padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table style="min-width:520px;">
+      <thead>
+        <tr>
+          <th colspan="2" style="text-align:center;border-right:2px solid var(--border);">Metric</th>
+          <th colspan="2" style="text-align:center;border-right:2px solid var(--border);">Imperial</th>
+          <th></th>
+        </tr>
+        <tr>
+          <th>Distance (m)</th>
+          <th style="border-right:2px solid var(--border);">Drift (mm)</th>
+          <th>Distance (yd)</th>
+          <th style="border-right:2px solid var(--border);">Drift (inch)</th>
+          <th>Drift (MOA)</th>
+        </tr>
+      </thead>
+      <tbody id="drift-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── 6. FORMULAS FOOTER ── -->
+<section>
+  <div class="section-label">Formulas &amp; References</div>
+  <div class="formulas">
+    <h3>Miller Twist Rule — Core Equations</h3>
+    <div class="formula-block">
+      <div class="f-row"><span class="f-name">Twist (calibers):</span><span class="f-eq">t = T / D</span></div>
+      <div class="f-row"><span class="f-name">Length (calibers):</span><span class="f-eq">lc = L / D</span></div>
+      <div class="f-row"><span class="f-name">Sg (uncorrected):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc·(1+lc²))</span></div>
+      <div class="f-row"><span class="f-name">Velocity factor:</span><span class="f-eq">fv = (v / 2800)^(1/3)  &nbsp;[v in fps]</span></div>
+      <div class="f-row"><span class="f-name">Atm. correction:</span><span class="f-eq">f_atm = √( (760/P_mmHg) · (T_K/288.15) )</span></div>
+      <div class="f-row"><span class="f-name">Sg (corrected):</span><span class="f-eq">Sg = Sg₀ · fv · f_atm</span></div>
+      <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
+      <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
+    </div>
+    <div class="refs">
+      <strong style="color:var(--text);">References:</strong><br>
+      Miller, D.G. (2005). <em>A New Rule for Estimating Rifling Twist.</em> Precision Shooting.<br>
+      Miller, D.G. (2009). <em>How Good Are Simple Rules for Estimating Rifle Twist.</em> Precision Shooting.<br>
+      Litz, B. (2015). <em>How Ballistic Coefficient Varies with Twist Rate.</em> Applied Ballistics.<br>
+      Validated against <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank">Berger Twist Rate Calculator</a>.
+      <br><br>
+      <span style="color:var(--muted);font-size:13px;">Last updated: April 3, 2026</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ─────────────────────────────────────────────
+//  GLOBAL STATE
+// ─────────────────────────────────────────────
+let lastParams = null;
+let atmChart   = null;
+
+// ─────────────────────────────────────────────
+//  THEME TOGGLE — light is default
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const saved = localStorage.getItem('bsc-theme') || 'light';
+  applyTheme(saved);
+});
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const track = document.getElementById('toggle-track');
+  const label = document.getElementById('theme-label');
+  if (!track) return;
+  if (theme === 'light') {
+    track.classList.add('on');
+    label.textContent = 'Light mode';
+  } else {
+    track.classList.remove('on');
+    label.textContent = 'Dark mode';
+  }
+  localStorage.setItem('bsc-theme', theme);
+  // Redraw chart if visible
+  if (atmChart) updateAtmMap();
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(cur === 'light' ? 'dark' : 'light');
+}
+
+// ─────────────────────────────────────────────
+//  UNIT CONVERSIONS
+// ─────────────────────────────────────────────
+function toInch(val, unit)    { return unit==='mm' ? val/25.4 : val; }
+function toGr(val, unit)      { return unit==='g'  ? val*15.4324 : val; }
+function toFps(val, unit)     { return unit==='ms' ? val*3.28084 : val; }
+function toCelsius(val, unit) { return unit==='F'  ? (val-32)/1.8 : val; }
+function toHpa(val, unit)     { return unit==='inHg' ? val*33.8639 : val; }
+
+// ─────────────────────────────────────────────
+//  G1→G7 CONVERSION FACTORS
+// ─────────────────────────────────────────────
+const G1G7 = { '1':1.52, '2':1.43, '3':1.60, '4':null, '5':null };
+
+// ─────────────────────────────────────────────
+//  CORE MILLER CALCULATION
+//  All inputs in: inch, gr, fps, °C, hPa
+//  Returns object with all results
+// ─────────────────────────────────────────────
+function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7_in, btype) {
+  const D     = D_in;
+  const L     = L_in;
+  const t_cal = twist_in / D;
+  const lc    = L / D;
+
+  const Sg_uncorr = (30 * m_gr) / (t_cal*t_cal * D*D*D * lc * (1 + lc*lc));
+
+  const mv_fps_val = mv_fps;
+  const fv    = Math.pow(mv_fps_val / 2800, 1/3);
+
+  const T_K   = T_C + 273.15;
+  const P_mmHg = P_hPa * 0.750062;
+  const f_atm = Math.sqrt((760.0 / P_mmHg) * (T_K / 288.15));
+
+  const Sg = Sg_uncorr * fv * f_atm;
+
+  // BC effective
+  const bc_eff = Sg >= 1.5 ? bc_g1 : bc_g1 * Math.max(0, 1 - (1.5 - Sg) * 0.30);
+  const bc_pct = bc_eff / bc_g1 * 100;
+
+  // G7
+  const factor = G1G7[btype];
+  let bc_g7_eff, g7_source;
+  if (!factor) {
+    bc_g7_eff = null; g7_source = 'N/A';
+  } else if (bc_g7_in > 0) {
+    bc_g7_eff = bc_g7_in; g7_source = 'measured';
+  } else {
+    bc_g7_eff = bc_g1 / factor; g7_source = 'estimated';
+  }
+  let bc_g7_korr = null;
+  if (bc_g7_eff !== null) {
+    bc_g7_korr = Sg >= 1.5 ? bc_g7_eff : bc_g7_eff * Math.max(0, 1 - (1.5-Sg)*0.30);
+  }
+
+  // Optimal twist
+  const t_opt_cal = Math.sqrt((30*m_gr) / (1.5*D*D*D*lc*(1+lc*lc))) / (fv*f_atm);
+  const T_opt = t_opt_cal * D;
+  const t_min_cal = Math.sqrt((30*m_gr) / (1.4*D*D*D*lc*(1+lc*lc))) / (fv*f_atm);
+  const T_min = t_min_cal * D;
+
+  // Sectional density
+  const SD = m_gr / (D*D * 7000);
+
+  // Spin drift table: 0..600 m in 50 m steps
+  const v0_ms = mv_fps_val * 0.3048;
+  const retard = bc_g1 * 17500;
+  const dist_m_arr = [0,50,100,150,200,250,300,350,400,450,500,550,600];
+  const drift = dist_m_arr.map(dm => {
+    const tof = (retard/v0_ms) * (Math.exp(dm/retard) - 1);
+    const drift_inch = 1.25 * (Sg + 1.2) * Math.pow(tof, 1.83);
+    return { dm, tof, drift_inch, drift_mm: drift_inch*25.4 };
+  });
+
+  return { D, lc, t_cal, Sg_uncorr, fv, f_atm, Sg, bc_eff, bc_pct,
+           bc_g7_eff, bc_g7_korr, g7_source, T_opt, T_min, SD, drift,
+           bc_g1, m_gr, L, twist_in, mv_fps: mv_fps_val, T_C, P_hPa };
+}
+
+
+// ─────────────────────────────────────────────
+//  PARSE NUMBER — accepts both , and . as decimal
+// ─────────────────────────────────────────────
+function parseNum(str) {
+  if (typeof str === 'number') return str;
+  return parseFloat(String(str).trim().replace(',', '.')) || 0;
+}
+
+
+// ─────────────────────────────────────────────
+// Conversion table: { unitKey: { from: [unit, unit], convert: fn(val, fromUnit, toUnit) } }
+var unitConverters = {
+  'caliber':    { units: ['inch', 'mm'],     fn: convLength  },
+  'bullet-len': { units: ['inch', 'mm'],     fn: convLength  },
+  'bullet-wt':  { units: ['gr', 'g'],        fn: convWeight  },
+  'twist':      { units: ['inch', 'mm'],     fn: convLength  },
+  'mv':         { units: ['fps', 'ms'],      fn: convVelocity},
+  'temp':       { units: ['C', 'F'],         fn: convTemp    },
+  'press':      { units: ['hPa', 'inHg'],    fn: convPress   },
+};
+
+function convLength(val, from, to) {
+  var inch = from === 'mm' ? val / 25.4 : val;
+  return to === 'mm' ? inch * 25.4 : inch;
+}
+function convWeight(val, from, to) {
+  var gr = from === 'g' ? val * 15.4324 : val;
+  return to === 'g' ? gr / 15.4324 : gr;
+}
+function convVelocity(val, from, to) {
+  var fps = from === 'ms' ? val * 3.28084 : val;
+  return to === 'ms' ? fps / 3.28084 : fps;
+}
+function convTemp(val, from, to) {
+  var c = from === 'F' ? (val - 32) / 1.8 : val;
+  return to === 'F' ? c * 1.8 + 32 : c;
+}
+function convPress(val, from, to) {
+  var hpa = from === 'inHg' ? val * 33.8639 : val;
+  return to === 'inHg' ? hpa / 33.8639 : hpa;
+}
+
+// Decimal steps per unit for nice rounding
+var unitSteps = {
+  'inch': 3, 'mm': 2, 'gr': 1, 'g': 2,
+  'fps': 0, 'ms': 1, 'C': 1, 'F': 1,
+  'hPa': 1, 'inHg': 2,
+};
+
+function convertField(fieldId, selectEl) {
+  var input   = document.getElementById(fieldId);
+  var fromUnit = selectEl.dataset.prev || selectEl.options[selectEl.selectedIndex === 0 ? 1 : 0].value;
+  var toUnit   = selectEl.value;
+  selectEl.dataset.prev = toUnit;
+
+  if (fromUnit === toUnit) return;
+
+  var conv = unitConverters[fieldId];
+  if (!conv) return;
+
+  var raw = parseNum(input.value);
+  if (isNaN(raw)) return;
+
+  var converted = conv.fn(raw, fromUnit, toUnit);
+  var decimals  = unitSteps[toUnit] !== undefined ? unitSteps[toUnit] : 3;
+  input.value   = converted.toFixed(decimals);
+
+  // Update step attribute
+  var stepMap = { 'inch':0.001, 'mm':0.01, 'gr':0.1, 'g':0.01,
+                  'fps':10, 'ms':1, 'C':0.5, 'F':1, 'hPa':0.5, 'inHg':0.01 };
+  if (stepMap[toUnit]) input.step = stepMap[toUnit];
+
+  // Also convert atm map range inputs if temp or pressure unit changed
+  if (fieldId === 'temp') {
+    ['t-min','t-max'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = convTemp(parseNum(el.value), fromUnit, toUnit);
+      el.value = v.toFixed(toUnit === 'F' ? 0 : 1);
+    });
+    ['t-unit-lbl','t-unit-lbl2'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = toUnit === 'F' ? '°F' : '°C';
+    });
+  }
+  if (fieldId === 'press') {
+    ['p-min','p-max'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = convPress(parseNum(el.value), fromUnit, toUnit);
+      el.value = v.toFixed(toUnit === 'inHg' ? 2 : 1);
+    });
+    ['p-unit-lbl','p-unit-lbl2'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = toUnit === 'inHg' ? 'inHg' : 'hPa';
+    });
+  }
+}
+
+// Initialize data-prev on all unit selects so first change works correctly
+document.addEventListener('DOMContentLoaded', function() {
+  ['caliber-unit','bullet-len-unit','bullet-wt-unit',
+   'twist-unit','mv-unit','temp-unit','press-unit'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (sel) sel.dataset.prev = sel.value;
+  });
+});
+
+
+
+// ─────────────────────────────────────────────
+//  MAIN CALCULATE
+// ─────────────────────────────────────────────
+function calculate() {
+  const D_in    = toInch(parseNum(document.getElementById('caliber').value),    document.getElementById('caliber-unit').value);
+  const L_in    = toInch(parseNum(document.getElementById('bullet-len').value), document.getElementById('bullet-len-unit').value);
+  const m_gr    = toGr  (parseNum(document.getElementById('bullet-wt').value),  document.getElementById('bullet-wt-unit').value);
+  const twist_in= toInch(parseNum(document.getElementById('twist').value),      document.getElementById('twist-unit').value);
+  const mv_fps  = toFps (parseNum(document.getElementById('mv').value),         document.getElementById('mv-unit').value);
+  const T_C     = toCelsius(parseNum(document.getElementById('temp').value),    document.getElementById('temp-unit').value);
+  const P_hPa   = toHpa (parseNum(document.getElementById('press').value),      document.getElementById('press-unit').value);
+  const bc_g1   = parseNum(document.getElementById('bc-g1').value);
+  const bc_g7   = parseNum(document.getElementById('bc-g7').value);
+  const btype   = document.getElementById('bullet-type').value;
+
+  const units = {
+    len:   document.getElementById('bullet-len-unit').value,
+    wt:    document.getElementById('bullet-wt-unit').value,
+    twist: document.getElementById('twist-unit').value,
+    mv:    document.getElementById('mv-unit').value,
+    temp:  document.getElementById('temp-unit').value,
+    press: document.getElementById('press-unit').value,
+    caliber: document.getElementById('caliber-unit').value,
+  };
+  const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7, btype);
+  lastParams = { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa };
+
+  renderSgScale(r.Sg);
+  renderResults(r, units);
+  renderDriftTable(r.drift);
+  updateAtmMap();
+
+  document.getElementById('sg-scale-wrap').style.display = 'block';
+  document.getElementById('results-box').style.display   = 'block';
+  document.getElementById('atm-section').style.display   = 'block';
+  document.getElementById('drift-section').style.display = 'block';
+}
+
+// ─────────────────────────────────────────────
+//  Sg SCALE
+// ─────────────────────────────────────────────
+function renderSgScale(Sg) {
+  const maxSg = 3.0;
+  const pct   = Math.min(Math.max(Sg / maxSg, 0), 1) * 100;
+  const arrow = document.getElementById('sg-arrow');
+  const label = document.getElementById('sg-val-lbl');
+  const bar   = document.getElementById('sg-bar');
+
+  arrow.style.left = pct + '%';
+  label.style.left = pct + '%';
+  label.textContent = 'Sg = ' + Sg.toFixed(4);
+
+  let hexCol;
+  if (Sg >= 1.5)      hexCol = '#4caf7d';
+  else if (Sg >= 1.3) hexCol = '#e8943a';
+  else                hexCol = '#e05a5a';
+
+  label.style.color = hexCol;
+  arrow.style.borderTopColor = hexCol;
+}
+
+// ─────────────────────────────────────────────
+//  RESULTS — summary + detail
+// ─────────────────────────────────────────────
+function renderResults(r, units) {
+  units = units || {};
+  const Sg = r.Sg;
+  const hdr = document.getElementById('results-hdr');
+
+  // ── Header bar ──
+  if (Sg >= 1.5) {
+    hdr.className = 'results-header green';
+    hdr.textContent = '✓ Stable — Sg = ' + Sg.toFixed(4) + '  (Sg ≥ 1.5)';
+  } else if (Sg >= 1.3) {
+    hdr.className = 'results-header orange';
+    hdr.textContent = '⚠ Marginally Stable — Sg = ' + Sg.toFixed(4) + '  (1.3 ≤ Sg < 1.5)';
+  } else {
+    hdr.className = 'results-header red';
+    hdr.textContent = '✗ Unstable — Sg = ' + Sg.toFixed(4) + '  (Sg < 1.3)';
+  }
+
+  const sgClass = Sg>=1.5 ? 'green' : Sg>=1.3 ? 'orange' : 'red';
+
+  // G7 strings
+  const g7rated = r.bc_g7_eff  !== null ? r.bc_g7_eff.toFixed(3)  : 'N/A';
+  const g7eff   = r.bc_g7_korr !== null ? r.bc_g7_korr.toFixed(3) : 'N/A';
+  const g7src   = r.bc_g7_eff  !== null ? r.g7_source : '';
+  const g7pct   = r.bc_g7_korr !== null ? (r.bc_g7_korr/r.bc_g7_eff*100).toFixed(1)+'%' : '';
+
+  // Twist stability status
+  const stableStatus  = Sg >= 1.5 ? 'Achieved' : 'Not achieved with selected twist';
+  const marginalStatus= Sg >= 1.3 ? 'Sg \u2265 1.3 at 2000 m / 2187 yd' : 'Not achieved with selected twist';
+
+  // Length in user's chosen unit
+  const lenUnit = units.len || 'inch';
+  const lenVal  = lenUnit === 'mm' ? (r.L*25.4).toFixed(2)+' mm' : r.L.toFixed(3)+' in';
+
+  // Caliber in user's chosen unit
+  const calUnit = units.caliber || 'inch';
+  const calVal  = calUnit === 'mm' ? (r.D*25.4).toFixed(2)+' mm' : r.D.toFixed(4)+' in';
+
+  // ── Summary block ──
+  // Helper functions — plain string concatenation, no nested template literals
+  // Three-column row: label | note | value
+  function sk(label) { return '<span class="sum-key">' + label + '</span>'; }
+  function sn(note)  { return note ? '<span class="sum-note">(' + note + ')</span>' : '<span></span>'; }
+  function sv(val, cls) {
+    return '<span class="sum-val' + (cls ? ' ' + cls : '') + '">' + val + '</span>';
+  }
+  // Row builder: sk(label) + sn(note) + sv(value)
+  function row(label, note, val, cls) {
+    return '<div class="sum-row">' + sk(label) + sn(note) + sv(val, cls) + '</div>';
+  }
+
+  var g1eff_pct = r.bc_pct.toFixed(1) + '%';
+  var g7eff_pct = g7eff !== 'N/A' ? (r.bc_g7_korr/r.bc_g7_eff*100).toFixed(1) + '%' : '';
+
+  var html = '<div class="summary-block">';
+
+  // Stability
+  html += '<div class="sum-group">';
+  html += '<div class="sum-group-title">Stability</div>';
+  var sgTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:340px;left:26px;right:auto;top:0;transform:none;">'
+    + '<b>Gyroscopic Stability Factor (Sg)</b><br>'
+    + 'Miller Twist Rule (2005):<br>'
+    + '<code>Sg = (30·m) / (t²·d³·l·(1+l²)) × fv × f_atm</code><br><br>'
+    + '<i>m</i> = bullet weight (grains)<br>'
+    + '<i>t</i> = twist rate (cal/turn)<br>'
+    + '<i>d</i> = diameter (inches)<br>'
+    + '<i>l</i> = length (calibers)<br>'
+    + '<i>fv</i> = (v/2800)^(1/3)<br>'
+    + '<i>f_atm</i> = √(760/P × T/288.15)<br><br>'
+    + '<b style="color:#4caf7d;">Sg ≥ 1.5</b> — Stable, full BC<br>'
+    + '<b style="color:#e8943a;">Sg 1.3–1.5</b> — Transitional<br>'
+    + '<b style="color:#e05a5a;">Sg &lt; 1.3</b> — Unstable<br><br>'
+    + 'Ref: Miller, D.G. (2005). Precision Shooting.'
+    + '</div></button>';
+  html += '<div class="sum-row">'
+    + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">Sg' + sgTip + '</span>'
+    + '<span></span>'
+    + '<span class="sum-val ' + sgClass + '">' + Sg.toFixed(4) + '</span>'
+    + '</div>';
+  html += row('SD',       '',        r.SD.toFixed(4) + ' lb/in\u00b2');
+  html += row('Stable',   '\u2265 1.5', stableStatus,   Sg >= 1.5 ? 'green' : 'red');
+  html += row('Marginal', 'max range 2000 m', marginalStatus, Sg >= 1.3 ? 'green' : 'red');
+  html += '</div>';
+
+  // Ballistic Coefficients
+  html += '<div class="sum-group">';
+  html += '<div class="sum-group-title">Ballistic Coefficients</div>';
+  html += row('BC G1', 'rated',     r.bc_g1.toFixed(3));
+  html += row('BC G1', 'effective ' + g1eff_pct, r.bc_eff.toFixed(3));
+  html += row('BC G7', g7src || 'rated', g7rated);
+  html += row('BC G7', 'effective' + (g7eff_pct ? ' ' + g7eff_pct : ''), g7eff !== 'N/A' ? g7eff : 'N/A');
+  html += '</div>';
+
+  // Twist Recommendations
+  html += '<div class="sum-group">';
+  html += '<div class="sum-group-title">Twist Recommendations</div>';
+  html += row('Optimal', 'Sg \u2265 1.5', '1:' + r.T_opt.toFixed(2) + '"');
+  html += row('Minimum', 'Sg \u2265 1.4', '1:' + r.T_min.toFixed(2) + '"');
+  html += '</div>';
+
+  // Bullet Geometry
+  html += '<div class="sum-group">';
+  html += '<div class="sum-group-title">Bullet Geometry</div>';
+  html += row('Caliber', '', calVal);
+  html += row('Length',  '', lenVal);
+  html += row('Length', 'calibers', r.lc.toFixed(3) + ' cal');
+  html += '</div>';
+
+  html += '</div>';
+  document.getElementById('results-summary').innerHTML = html;
+
+    // ── Show toggle ──
+  const tog = document.getElementById('results-detail-toggle');
+  tog.style.display = 'flex';
+
+  // ── Detail grid ──
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = `
+    ${ri('Sg (uncorrected)',       rv(r.Sg_uncorr.toFixed(4)), 'before velocity & atm. corr.')}
+    ${ri('Velocity factor fv',     rv(r.fv.toFixed(4)), 'fv = (mv / 2800)^(1/3)')}
+    ${ri('Atm. correction f_atm', rv(r.f_atm.toFixed(4)), '√((760/P_mmHg)·(T_K/288.15))')}
+    ${ri('Twist rate (calibers)',  rv(r.t_cal.toFixed(4)+' cal/turn'), '')}
+  `;
+}
+
+function toggleDetail() {
+  const grid  = document.getElementById('results-grid');
+  const arrow = document.getElementById('detail-arrow');
+  const label = document.getElementById('detail-label');
+  const open  = grid.style.display !== 'none';
+  grid.style.display  = open ? 'none' : 'grid';
+  arrow.textContent   = open ? '▶' : '▼';
+  label.textContent   = open ? 'SHOW DETAILED PARAMETERS' : 'HIDE DETAILED PARAMETERS';
+}
+
+function rv(v)      { return `<span class="r-val">${v}</span>`; }
+function ri(lbl,val,sub) {
+  return `<div class="result-item"><div class="r-label">${lbl}</div>${val}<div class="r-sub">${sub}</div></div>`;
+}
+
+// ─────────────────────────────────────────────
+//  SPIN DRIFT TABLE
+// ─────────────────────────────────────────────
+function renderDriftTable(drift) {
+  const tb = document.getElementById('drift-tbody');
+  tb.innerHTML = drift.map(d => {
+    const yd   = (d.dm * 1.09361).toFixed(0);
+    const moa  = d.dm > 0 ? (d.drift_inch / (d.dm*1.09361/100)).toFixed(2) : '—';
+    return '<tr>'
+      + '<td>' + d.dm + '</td>'
+      + '<td style="border-right:2px solid var(--border2);">' + d.drift_mm.toFixed(1) + '</td>'
+      + '<td>' + yd + '</td>'
+      + '<td style="border-right:2px solid var(--border2);">' + d.drift_inch.toFixed(2) + '</td>'
+      + '<td>' + moa + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+//  ATMOSPHERIC MAP
+// ─────────────────────────────────────────────
+function updateAtmMap() {
+  if (!lastParams) return;
+  const { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa } = lastParams;
+
+  // Detect user's chosen units
+  const tempUnit  = (document.getElementById('temp-unit')  || {value:'C'}).value;
+  const pressUnit = (document.getElementById('press-unit') || {value:'hPa'}).value;
+  const usingF    = tempUnit  === 'F';
+  const usingInHg = pressUnit === 'inHg';
+
+  // Update range labels
+  ['t-unit-lbl','t-unit-lbl2'].forEach(id => {
+    var el = document.getElementById(id); if (el) el.textContent = usingF ? '°F' : '°C';
+  });
+  ['p-unit-lbl','p-unit-lbl2'].forEach(id => {
+    var el = document.getElementById(id); if (el) el.textContent = usingInHg ? 'inHg' : 'hPa';
+  });
+
+  // Range values in display units
+  const tMinD = parseNum(document.getElementById('t-min').value);
+  const tMaxD = parseNum(document.getElementById('t-max').value);
+  const pMinD = parseNum(document.getElementById('p-min').value);
+  const pMaxD = parseNum(document.getElementById('p-max').value);
+
+  // Current conditions in display units (for star marker)
+  const T_C_star = T_C;
+  const P_hPa_star = P_hPa;
+  const starT = usingF ? T_C_star * 1.8 + 32 : T_C_star;
+  const starP = usingInHg ? P_hPa_star / 33.8639 : P_hPa_star;
+
+  // Convert range to internal units (°C, hPa) for millerCalc
+  function dispToC(t)    { return usingF    ? (t - 32) / 1.8 : t; }
+  function dispToHpa(p)  { return usingInHg ? p * 33.8639    : p; }
+
+  const nT = 30, nP = 20;
+  const tempsD = Array.from({length:nT}, (_,i) => tMinD + i*(tMaxD-tMinD)/(nT-1));
+  const pressD = Array.from({length:nP}, (_,i) => pMinD + i*(pMaxD-pMinD)/(nP-1));
+
+  const heatData = [];
+  for (let pi = 0; pi < nP; pi++) {
+    for (let ti = 0; ti < nT; ti++) {
+      const t_c  = dispToC(tempsD[ti]);
+      const p_hp = dispToHpa(pressD[pi]);
+      const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype);
+      heatData.push({ x: tempsD[ti], y: pressD[pi], sg: r.Sg });
+    }
+  }
+
+  // Color function
+  function sgColor(sg, alpha=0.85) {
+    if (sg >= 1.5) return `rgba(76,175,125,${alpha})`;
+    if (sg >= 1.3) return `rgba(232,148,58,${alpha})`;
+    return `rgba(224,90,90,${alpha})`;
+  }
+
+  // Bubble chart via Chart.js
+  // Star first (rendered first = underneath), then heatmap, but we use order to flip
+  const starDataset = {
+    label: 'Current',
+    data: [{ x: starT, y: starP, r: 14 }],
+    backgroundColor: 'rgba(79,195,247,1.0)',
+    borderColor: 'white',
+    borderWidth: 2.5,
+    order: 1,
+  };
+
+  const datasets = [{
+    label: 'Sg field',
+    data: heatData.map(d => ({ x: d.x, y: d.y, r: 6 })),
+    backgroundColor: heatData.map(d => sgColor(d.sg, 0.75)),
+    borderWidth: 0,
+    pointRadius: 0,
+    order: 2,
+  }, starDataset];
+
+
+  const ctx = document.getElementById('atm-chart').getContext('2d');
+  if (atmChart) atmChart.destroy();
+
+  atmChart = new Chart(ctx, {
+    type: 'bubble',
+    data: { datasets },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const d = ctx.raw;
+              if (ctx.dataset.label === 'Current') return 'Current: ' + d.x.toFixed(1) + (usingF ? '°F' : '°C') + ', ' + d.y.toFixed(2) + (usingInHg ? ' inHg' : ' hPa');
+              const pt = heatData[ctx.dataIndex];
+              if (!pt) return '';
+              return `T=${pt.x.toFixed(1)}°C  P=${pt.y.toFixed(0)}hPa  Sg=${pt.sg.toFixed(3)}`;
+            }
+          },
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+          borderWidth: 1,
+          titleColor: 'var(--text)',
+          bodyColor: 'var(--text)',
+          bodyFont: { family: 'IBM Plex Mono', size: 11 }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: usingF ? 'Temperature (°F)' : 'Temperature (°C)', color: '#5a6172',
+                   font: { family: 'IBM Plex Mono', size: 13 } },
+          ticks: { color: '#5a6172', font: { family:'IBM Plex Mono', size:12 } },
+          grid:  { color: '#1e2229' },
+          min: tMinD, max: tMaxD
+        },
+        y: {
+          title: { display: true, text: usingInHg ? 'Pressure (inHg)' : 'Pressure (hPa)', color: '#5a6172',
+                   font: { family: 'IBM Plex Mono', size: 13 } },
+          ticks: { color: '#5a6172', font: { family:'IBM Plex Mono', size:12 } },
+          grid:  { color: '#1e2229' },
+          min: pMinD, max: pMaxD
+        }
+      }
+    },
+    plugins: [{
+      id: 'isoLines',
+      afterDraw(chart) {
+        const { ctx, chartArea: ca, scales: { x: xs, y: ys } } = chart;
+        drawIsoLine(ctx, xs, ys, ca, tempsD, pressD, heatData, nT, nP, 1.5, '#ffffff', 2, '1.5');
+        drawIsoLine(ctx, xs, ys, ca, tempsD, pressD, heatData, nT, nP, 1.3, '#ffffff88', 1.5, '1.3');
+      }
+    }]
+  });
+}
+
+function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, color, width, label) {
+  // Simple marching-squares-style segment finder
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.setLineDash(level===1.5 ? [] : [4,3]);
+  ctx.beginPath();
+
+  let firstPt = true;
+  for (let pi = 0; pi < nP-1; pi++) {
+    for (let ti = 0; ti < nT-1; ti++) {
+      const idx = (i,j) => j*nT + i;
+      const sg = [
+        heatData[idx(ti,pi)].sg,
+        heatData[idx(ti+1,pi)].sg,
+        heatData[idx(ti+1,pi+1)].sg,
+        heatData[idx(ti,pi+1)].sg,
+      ];
+      // check if this cell crosses the level
+      const above = sg.map(v=>v>=level);
+      if (above.every(v=>v) || above.every(v=>!v)) continue;
+
+      // midpoint of cell in data coords
+      const tmid = (temps[ti]+temps[ti+1])/2;
+      const pmid = (press[pi]+press[pi+1])/2;
+      const cx_ = xs.getPixelForValue(tmid);
+      const cy_ = ys.getPixelForValue(pmid);
+
+      if (cx_<ca.left||cx_>ca.right||cy_<ca.top||cy_>ca.bottom) continue;
+      if (firstPt) { ctx.moveTo(cx_,cy_); firstPt=false; }
+      else          { ctx.lineTo(cx_,cy_); }
+    }
+  }
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+</script>
+
+<!-- ── ABOUT MODAL ── -->
+<div id="about-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;max-width:520px;width:100%;padding:32px;position:relative;font-family:var(--sans);line-height:1.7;max-height:90vh;overflow-y:auto;">
+    <button onclick="document.getElementById('about-modal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;">✕</button>
+
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:16px;">About this calculator</div>
+
+    <p style="color:var(--text);font-size:14px;margin-bottom:16px;">
+      This ballistic stability calculator was built by a passionate hunter and handloader from Sweden, with love for understanding physics behind the shot. It implements the <b>Miller Twist Rule</b> (2005, 2009). Results have been verified against the excellent calculators at <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank" style="color:var(--accent2);">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank" style="color:var(--accent2);">Berger Twist Rate Calculator</a>, both of which deserve full credit for making ballistic science accessible to shooters.
+    </p>
+
+    <p style="color:var(--text);font-size:14px;margin-bottom:16px;">
+      This tool was developed with the assistance of <a href="https://www.anthropic.com" target="_blank" style="color:var(--accent2);">Claude</a> by <a href="https://www.anthropic.com" target="_blank" style="color:var(--accent2);">Anthropic</a>.
+    </p>
+
+    <div style="background:rgba(232,148,58,0.08);border:1px solid rgba(232,148,58,0.3);border-radius:4px;padding:14px 16px;margin-bottom:16px;">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;">⚠ Disclaimer</div>
+      <p style="color:var(--text);font-size:13px;margin:0;line-height:1.6;">
+        This calculator is provided for informational and educational purposes only. All results should be verified against manufacturer data and tested safely at the range. The author accepts no responsibility for decisions made based on these calculations. Use at your own risk and always follow safe handloading practices.
+      </p>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:11px;color:var(--muted);">
+      Based on: Miller, D.G. (2005, 2009). <i>Precision Shooting.</i><br>
+      Litz, B. (2015). <i>Applied Ballistics.</i>
+    </div>
+  </div>
+</div>
+
+<script>
+// Close modal on backdrop click
+document.getElementById('about-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.style.display = 'none';
+});
+// Close on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.getElementById('about-modal').style.display = 'none';
+});
+</script>
+</body>
+</html>

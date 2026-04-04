@@ -374,7 +374,7 @@
   /* ── Summary block ── */
   .summary-block {
     font-family: var(--mono);
-    font-size: 14.5px;
+    font-size: 13px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0;
@@ -385,6 +385,9 @@
     padding: 14px 20px;
     border-bottom: 1px solid var(--border2);
   }
+  @media (max-width: 600px) {
+    .sum-group { padding: 10px 12px; }
+  }
   .sum-group:nth-child(odd) { border-right: 1px solid var(--border2); }
   .sum-group:last-child,
   .sum-group:nth-last-child(2):nth-child(odd) { border-bottom: none; }
@@ -392,9 +395,22 @@
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: baseline;
-    gap: 0 10px;
+    gap: 0 6px;
     padding: 3px 0;
     border-bottom: 1px dotted var(--border2);
+  }
+  @media (max-width: 600px) {
+    .sum-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: baseline;
+      gap: 0 4px;
+    }
+    .sum-note { font-size: 10px; }
+    .sum-key  { font-size: 11px; }
+    .sum-val  { font-size: 11px; }
+    .sum-group { padding: 8px 10px; }
+    .sum-group-title { font-size: 10px; }
   }
   .sum-row:last-child { border-bottom: none; }
   .sum-key  { color: var(--muted); white-space: nowrap; }
@@ -532,20 +548,33 @@
   /* ── Atmosphere range controls ── */
   .atm-controls {
     display: flex;
-    gap: 10px;
+    flex-direction: row;
     flex-wrap: wrap;
+    gap: 8px 16px;
     margin-bottom: 14px;
     align-items: center;
     font-family: var(--mono);
     font-size: 13px;
     color: var(--muted);
-    row-gap: 6px;
   }
-  .atm-controls label { display: flex; align-items: center; gap: 6px; }
-  .atm-controls input[type="text"] { width: 60px; font-size: 15px; padding: 4px 6px; }
+  .atm-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  .atm-label {
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 100px;
+  }
+  .atm-controls label { display: flex; align-items: center; gap: 4px; }
+  .atm-controls input[type="text"] { width: 60px; font-size: 13px; padding: 4px 6px; }
   @media (max-width: 600px) {
-    .atm-controls { gap: 6px; font-size: 12px; flex-wrap: wrap; }
-    .atm-controls input[type="text"] { width: 44px; font-size: 12px; }
+    .atm-controls { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .atm-row { gap: 5px; }
+    .atm-label { min-width: 85px; font-size: 11px; }
+    .atm-controls input[type="text"] { width: 44px; font-size: 11px; }
     .atm-controls .calc-btn { font-size: 11px !important; padding: 4px 10px !important; }
   }
 
@@ -589,7 +618,7 @@ Used internally as <i>d</i> (inches) in all stability calculations.</div></butto
         </div>
         <input type="text" inputmode="decimal" id="caliber" value="0.308" step="0.001" min="0.1">
         <select id="caliber-unit"   onchange="convertField('caliber',   this)">
-          <option value="inch" selected>inch</option>
+          <option value="inch" selected>in</option>
           <option value="mm">mm</option>
         </select>
       </div>
@@ -604,7 +633,7 @@ Longer bullets require faster twist rates to stabilize.</div></button>
         </div>
         <input type="text" inputmode="decimal" id="bullet-len" value="1.299" step="0.001" min="0.1">
         <select id="bullet-len-unit" onchange="convertField('bullet-len', this)">
-          <option value="inch" selected>inch</option>
+          <option value="inch" selected>in</option>
           <option value="mm">mm</option>
         </select>
       </div>
@@ -779,13 +808,19 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
   <div class="section-label">03 — Atmospheric Stability Map</div>
   <div class="chart-wrap">
     <div class="atm-controls">
-      <span>Temperature range:</span>
-      <label>from <input type="text" inputmode="decimal" id="t-min" value="-4" style="width:60px;"> <span id="t-unit-lbl">°F</span></label>
-      <label>to <input type="text" inputmode="decimal" id="t-max" value="104" style="width:60px;"> <span id="t-unit-lbl2">°F</span></label>
-      <span style="margin-left:16px;">Pressure range:</span>
-      <label>from <input type="text" inputmode="decimal" id="p-min" value="28.1" style="width:70px;"> <span id="p-unit-lbl">inHg</span></label>
-      <label>to <input type="text" inputmode="decimal" id="p-max" value="31.0" style="width:70px;"> <span id="p-unit-lbl2">inHg</span></label>
-      <button class="calc-btn" style="width:auto;padding:5px 14px;font-size:13px;margin-top:0;flex-shrink:0;margin-left:auto;" onclick="updateAtmMap()">UPDATE MAP</button>
+      <div class="atm-row">
+        <span class="atm-label">Temperature:</span>
+        <label><input type="text" inputmode="decimal" id="t-min" value="-4"> <span id="t-unit-lbl">°F</span></label>
+        <span>—</span>
+        <label><input type="text" inputmode="decimal" id="t-max" value="104"> <span id="t-unit-lbl2">°F</span></label>
+      </div>
+      <div class="atm-row">
+        <span class="atm-label">Pressure:</span>
+        <label><input type="text" inputmode="decimal" id="p-min" value="28.1"> <span id="p-unit-lbl">inHg</span></label>
+        <span>—</span>
+        <label><input type="text" inputmode="decimal" id="p-max" value="31.0"> <span id="p-unit-lbl2">inHg</span></label>
+      </div>
+      <button class="calc-btn" style="width:auto;padding:6px 20px;font-size:13px;margin-top:0;flex-shrink:0;" onclick="updateAtmMap()">UPDATE MAP</button>
     </div>
     <canvas id="atm-chart" height="280"></canvas>
     <div style="margin-top:10px;font-family:var(--mono);font-size:14px;color:var(--muted);display:flex;gap:24px;flex-wrap:wrap;">
@@ -1171,11 +1206,12 @@ function renderResults(r, units) {
 
   // Length in user's chosen unit
   const lenUnit = units.len || 'inch';
-  const lenVal  = lenUnit === 'mm' ? (r.L*25.4).toFixed(2)+' mm' : r.L.toFixed(3)+' in';
-
-  // Caliber in user's chosen unit
+  // Use raw input values to preserve user's precision
   const calUnit = units.caliber || 'inch';
-  const calVal  = calUnit === 'mm' ? (r.D*25.4).toFixed(2)+' mm' : r.D.toFixed(4)+' in';
+  const calRaw = document.getElementById('caliber').value;
+  const lenRaw = document.getElementById('bullet-len').value;
+  const lenVal  = lenUnit === 'mm' ? lenRaw + ' mm' : lenRaw + ' in';
+  const calVal  = calUnit === 'mm' ? calRaw + ' mm' : calRaw + ' in';
 
   // ── Summary block ──
   // Helper functions — plain string concatenation, no nested template literals
@@ -1218,7 +1254,7 @@ function renderResults(r, units) {
     + '<span></span>'
     + '<span class="sum-val ' + sgClass + '">' + Sg.toFixed(4) + '</span>'
     + '</div>';
-  html += row('SD',       '',        r.SD.toFixed(4) + ' lb/in\u00b2');
+  html += row('SD',       '',        r.SD.toFixed(4) + ' lb/in²');
   html += row('Stable',   '\u2265 1.5', stableStatus,   Sg >= 1.5 ? 'green' : 'red');
   html += row('Marginal', 'max range 2000 m', marginalStatus, Sg >= 1.3 ? 'green' : 'red');
   html += '</div>';
@@ -1235,8 +1271,8 @@ function renderResults(r, units) {
   // Twist Recommendations
   html += '<div class="sum-group">';
   html += '<div class="sum-group-title">Twist Recommendations</div>';
-  html += row('Optimal', 'Sg \u2265 1.5', '1:' + r.T_opt.toFixed(2) + '"');
-  html += row('Minimum', 'Sg \u2265 1.4', '1:' + r.T_min.toFixed(2) + '"');
+  html += row('Optimal', 'Sg \u2265 1.5', '1:' + r.T_opt.toFixed(2) + '" in');
+  html += row('Minimum', 'Sg \u2265 1.4', '1:' + r.T_min.toFixed(2) + '" in');
   html += '</div>';
 
   // Bullet Geometry
@@ -1368,7 +1404,7 @@ function updateAtmMap() {
 
   const datasets = [{
     label: 'Sg field',
-    data: heatData.map(d => ({ x: d.x, y: d.y, r: 6 })),
+    data: heatData.map(d => ({ x: d.x, y: d.y, r: window.innerWidth < 600 ? 4 : 6 })),
     backgroundColor: heatData.map(d => sgColor(d.sg, 0.75)),
     borderWidth: 0,
     pointRadius: 0,
@@ -1393,7 +1429,7 @@ function updateAtmMap() {
               if (ctx.dataset.label === 'Current') return 'Current: ' + d.x.toFixed(1) + (usingF ? '°F' : '°C') + ', ' + d.y.toFixed(2) + (usingInHg ? ' inHg' : ' hPa');
               const pt = heatData[ctx.dataIndex];
               if (!pt) return '';
-              return `T=${pt.x.toFixed(1)}°C  P=${pt.y.toFixed(0)}hPa  Sg=${pt.sg.toFixed(3)}`;
+              return 'T=' + pt.x.toFixed(1) + (usingF ? '°F' : '°C') + '  P=' + pt.y.toFixed(usingInHg ? 2 : 0) + (usingInHg ? ' inHg' : ' hPa') + '  Sg=' + pt.sg.toFixed(3);
             }
           },
           backgroundColor: 'var(--surface)',

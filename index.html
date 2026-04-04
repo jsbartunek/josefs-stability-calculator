@@ -409,14 +409,14 @@
   }
   @media (max-width: 600px) {
     .sum-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
+      display: flex;
+      flex-wrap: wrap;
       align-items: baseline;
       gap: 0 4px;
     }
+    .sum-key  { font-size: 11px; flex: 1 1 auto; }
     .sum-note { font-size: 10px; }
-    .sum-key  { font-size: 11px; }
-    .sum-val  { font-size: 11px; }
+    .sum-val  { font-size: 11px; flex-shrink: 0; }
     .sum-group { padding: 8px 10px; }
     .sum-group-title { font-size: 10px; }
   }

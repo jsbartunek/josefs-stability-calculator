@@ -1016,7 +1016,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
 // ─────────────────────────────────────────────
 function parseNum(str) {
   if (typeof str === 'number') return str;
-  return parseFloat(String(str).trim().replace(',', '.')) || 0;
+  return parseFloat(String(str).trim().replace(/,/g, '.')) || 0;
 }
 
 
@@ -1550,6 +1550,17 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 // Close modal on backdrop click
 document.getElementById('about-modal').addEventListener('click', function(e) {
   if (e.target === this) this.style.display = 'none';
+});
+// Replace comma with dot on all decimal inputs (fixes iOS keyboard)
+document.querySelectorAll("input[inputmode=\"decimal\"]").forEach(function(input) {
+  input.addEventListener("input", function() {
+    var pos = this.selectionStart;
+    var hadComma = this.value.includes(",");
+    this.value = this.value.replace(/,/g, ".");
+    if (hadComma && pos > 0) {
+      try { this.setSelectionRange(pos, pos); } catch(e) {}
+    }
+  });
 });
 // Close on Escape
 document.addEventListener('keydown', function(e) {

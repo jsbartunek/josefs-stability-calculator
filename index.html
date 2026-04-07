@@ -248,26 +248,25 @@
     flex-shrink: 0;
   }
   .tip-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .tip-btn.tip-active { border-color: var(--accent2); color: var(--accent2); }
   .tip-btn .tip-box {
     display: none;
-    position: absolute;
-    left: 26px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: fixed;
     background: var(--surface);
     color: var(--text);
     border: 1px solid var(--border);
-    color: var(--text);
     font-family: var(--sans);
     font-size: 15px;
     line-height: 1.5;
     padding: 10px 12px;
     border-radius: 4px;
-    width: 300px;
-    z-index: 100;
+    width: 260px;
+    z-index: 1000;
     pointer-events: none;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    white-space: normal;
   }
+  .tip-btn .tip-box.tip-visible { display: block; }
   .tip-btn .tip-box code {
     font-family: var(--mono);
     font-size: 12px;
@@ -276,19 +275,6 @@
     padding: 1px 4px;
     border-radius: 2px;
     word-break: break-all;
-  }
-  .tip-btn:hover .tip-box { display: block; }
-  @media (max-width: 600px) {
-    .tip-btn .tip-box {
-      left: auto;
-      right: auto;
-      top: 28px;
-      transform: none;
-      width: min(260px, 80vw);
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-    }
   }
 
   /* ── Bullet type select ── */
@@ -1397,7 +1383,7 @@ function renderResults(r, units) {
   // Stability
   html += '<div class="sum-group">';
   html += '<div class="sum-group-title">Stability</div>';
-  var sgTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:280px;left:26px;right:auto;top:-60px;transform:none;white-space:normal;">'
+  var sgTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box">'
     + '<b>Gyroscopic Stability Factor (Sg)</b><br>'
     + 'Miller Twist Rule (2005):<br>'
     + '<code>Sg = (30·m) / (t²·d³·l·(1+l²)) × fv × f_atm</code><br><br>'
@@ -1415,7 +1401,7 @@ function renderResults(r, units) {
     + '</div>';
   html += row('SD',       '',        r.SD.toFixed(4) + ' lb/in²');
   html += row('Stable',    '\u2265 1.5', stableStatus, Sg >= 1.5 ? 'green' : 'red');
-  var transonicTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:260px;left:26px;right:auto;top:50%;transform:translateY(-50%);white-space:normal;">'
+  var transonicTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box">'
     + 'Range at which the bullet enters the transonic regime (Mach &lt; 1.2).<br><br>The Miller twist rule is valid up to this distance. Beyond it, gyroscopic stability may degrade — dynamic stability is not modelled here.'
     + '</div></button>';
   html += '<div class="sum-row">'
@@ -1754,6 +1740,74 @@ document.querySelectorAll("input[inputmode=\"decimal\"]").forEach(function(input
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') document.getElementById('about-modal').style.display = 'none';
 });
+
+// ── Tooltip system — JS-driven, event delegation, works for dynamic elements ──
+(function() {
+  var openTimer = null, activeBtn = null;
+
+  function showTip(btn) {
+    if (activeBtn && activeBtn !== btn) hideTip(activeBtn);
+    activeBtn = btn;
+    btn.classList.add('tip-active');
+    var box = btn.querySelector('.tip-box');
+    if (!box) return;
+    box.classList.add('tip-visible');
+
+    var rect = btn.getBoundingClientRect();
+    var W = window.innerWidth, H = window.innerHeight;
+    var boxW = 260;
+    box.style.width = Math.min(boxW, W - 16) + 'px';
+    box.style.left = '0px'; box.style.top = '0px'; // reset before measuring
+    var boxH = box.offsetHeight || 200;
+
+    var left = rect.right + 8;
+    if (left + boxW > W - 8) left = rect.left - boxW - 8;
+    if (left < 8) left = 8;
+
+    var top = rect.top + rect.height/2 - boxH/2;
+    if (top + boxH > H - 8) top = H - boxH - 8;
+    if (top < 8) top = 8;
+
+    box.style.left = left + 'px';
+    box.style.top  = top  + 'px';
+  }
+
+  function hideTip(btn) {
+    if (!btn) return;
+    btn.classList.remove('tip-active');
+    var box = btn.querySelector('.tip-box');
+    if (box) box.classList.remove('tip-visible');
+    if (activeBtn === btn) activeBtn = null;
+  }
+
+  // Mouse — delegation on document
+  document.addEventListener('mouseover', function(e) {
+    var btn = e.target.closest('.tip-btn');
+    if (!btn) return;
+    clearTimeout(openTimer);
+    openTimer = setTimeout(function() { showTip(btn); }, 400);
+  });
+  document.addEventListener('mouseout', function(e) {
+    var btn = e.target.closest('.tip-btn');
+    if (!btn) return;
+    clearTimeout(openTimer);
+    hideTip(btn);
+  });
+
+  // Touch — tap to toggle
+  document.addEventListener('touchstart', function(e) {
+    var btn = e.target.closest('.tip-btn');
+    if (btn) {
+      e.preventDefault();
+      if (activeBtn === btn) { hideTip(btn); return; }
+      showTip(btn);
+    } else if (activeBtn) {
+      hideTip(activeBtn);
+    }
+  }, {passive: false});
+})();
+
+
 </script>
 </body>
 </html>

@@ -1397,7 +1397,7 @@ function renderResults(r, units) {
   // Stability
   html += '<div class="sum-group">';
   html += '<div class="sum-group-title">Stability</div>';
-  var sgTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:340px;left:26px;right:auto;top:0;transform:none;">'
+  var sgTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:280px;left:26px;right:auto;top:-60px;transform:none;white-space:normal;">'
     + '<b>Gyroscopic Stability Factor (Sg)</b><br>'
     + 'Miller Twist Rule (2005):<br>'
     + '<code>Sg = (30·m) / (t²·d³·l·(1+l²)) × fv × f_atm</code><br><br>'
@@ -1406,11 +1406,7 @@ function renderResults(r, units) {
     + '<i>d</i> = diameter (inches)<br>'
     + '<i>l</i> = length (calibers)<br>'
     + '<i>fv</i> = (v/2800)^(1/3)<br>'
-    + '<i>f_atm</i> = √(760/P × T/288.15)<br><br>'
-    + '<b style="color:#4caf7d;">Sg ≥ 1.5</b> — Stable, full BC<br>'
-    + '<b style="color:#e8943a;">Sg 1.3–1.5</b> — Transitional<br>'
-    + '<b style="color:#e05a5a;">Sg &lt; 1.3</b> — Unstable<br><br>'
-    + 'Ref: Miller, D.G. (2005). Precision Shooting.'
+    + '<i>f_atm</i> = √(760/P × T/288.15)'
     + '</div></button>';
   html += '<div class="sum-row">'
     + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">Sg' + sgTip + '</span>'
@@ -1419,7 +1415,14 @@ function renderResults(r, units) {
     + '</div>';
   html += row('SD',       '',        r.SD.toFixed(4) + ' lb/in²');
   html += row('Stable',    '\u2265 1.5', stableStatus, Sg >= 1.5 ? 'green' : 'red');
-  html += row('Transonic', 'Miller valid above', transonicStr, 'orange');
+  var transonicTip = '<button class="tip-btn" style="flex-shrink:0;margin-left:4px;">?<div class="tip-box" style="width:260px;left:26px;right:auto;top:50%;transform:translateY(-50%);white-space:normal;">'
+    + 'Range at which the bullet enters the transonic regime (Mach &lt; 1.2).<br><br>The Miller twist rule is valid up to this distance. Beyond it, gyroscopic stability may degrade — dynamic stability is not modelled here.'
+    + '</div></button>';
+  html += '<div class="sum-row">'
+    + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">Transonic' + transonicTip + '</span>'
+    + '<span></span>'
+    + '<span class="sum-val orange">' + transonicStr + '</span>'
+    + '</div>';
   // Flat-base / round-nose correction note
   var btype = document.getElementById('bullet-type').value;
   if (btype === '4') {
@@ -1452,7 +1455,7 @@ function renderResults(r, units) {
   html += '<div class="sum-group-title">Bullet Geometry</div>';
   html += row('Caliber', '', calVal);
   html += row('Length',  '', lenVal);
-  html += row('Length', 'calibers', r.lc.toFixed(3) + ' cal');
+  html += row('Length', '', r.lc.toFixed(3) + ' cal');
   html += '</div>';
 
   html += '</div>';
@@ -1719,7 +1722,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      Last updated: April 6, 2026 (v1.2 — Gehtsoft G1/G7 drag tables, Siacci/Ingalls normalization) &nbsp;·&nbsp;
+      Last updated: April 7, 2026 (v1.3 — transonic label fix, L/D geometry label) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
   </div>

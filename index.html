@@ -678,19 +678,16 @@ Not applicable for flat-base or round-nose bullets.</div></button>
 Used only when G7 BC = 0 (auto-estimate).<br>
 <code>BC_G7 = BC_G1 / factor</code><br><br>
 <span style="display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13px;">
-<span>Pointed BT polymer tip</span><span style="text-align:right;color:var(--accent);">1.52</span>
-<span>Pointed long BT (VLD/Hybrid)</span><span style="text-align:right;color:var(--accent);">1.43</span>
-<span>Pointed BT softpoint</span><span style="text-align:right;color:var(--accent);">1.60</span>
+<span>Pointed boat-tail (all types)</span><span style="text-align:right;color:var(--accent);">1.95</span>
 <span>Flat base</span><span style="text-align:right;color:var(--muted);">N/A</span>
 <span>Round nose</span><span style="text-align:right;color:var(--muted);">N/A</span>
-</span></div></button>
+</span><br>
+Factor 1.95 applies to all pointed boat-tail bullets (polymer tip, VLD, hybrid, soft-point BT, HPBT/OTM). Based on radar-measured data from Berger, Nosler, Lapua and Hornady — see ‡ below.</div></button>
         </div>
         <select id="bullet-type" style="width:auto;text-align:left;">
-          <option value="1">Pointed BT polymer tip</option>
-          <option value="2">Pointed long BT (VLD/Hybrid)</option>
-          <option value="3">Pointed BT softpoint</option>
-          <option value="4">Flat base</option>
-          <option value="5">Round nose</option>
+          <option value="1">Pointed boat-tail (all types)</option>
+          <option value="2">Flat base</option>
+          <option value="3">Round nose</option>
         </select>
       </div>
     </div>
@@ -864,6 +861,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <div class="f-row"><span class="f-name">Stable twist:</span><span class="f-eq">T_opt = D · √( 30·m·fv·f_atm / (1.5·D³·lc·(1+lc²)) )  &nbsp;[Sg = 1.5, displayed floor to 0.01"]</span></div>
       <div class="f-row"><span class="f-name">Minimum twist:</span><span class="f-eq">T_min = D · √( 30·m·fv·f_atm / (1.3·D³·lc·(1+lc²)) )  &nbsp;[Sg = 1.3, displayed floor to 0.01"]</span></div>
       <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
+      <div class="f-row"><span class="f-name">G1→G7 estimate §:</span><span class="f-eq">BC_G7 = BC_G1 / 1.95  (all pointed BT types — see § below)</span></div>
       <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
       <div class="f-row"><span class="f-name">Sg (flat-base †):</span><span class="f-eq">Sg_corrected ≈ Sg × 1.15</span></div>
       <div class="f-row"><span class="f-name">Transonic dist. ‡:</span><span class="f-eq">a = (π/8)·ρv²C<sub>d</sub>(M) / BC<sub>SI</sub>  &nbsp;[Siacci/Ingalls]</span></div>
@@ -880,6 +878,16 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <span style="font-size:12px;">† <strong>Flat-base Sg correction (Sg × 1.15):</strong> Miller's denominator (1 + lc²) is empirically calibrated for boat-tail bullet geometry. For flat-base bullets, the aerodynamic overturning moment (C<sub>Mα</sub>) is lower, meaning actual gyroscopic stability is higher than Miller predicts. To derive a correction factor, Miller's minimum twist estimates were compared against Berger Bullets' published minimum twist rates for 13 flat-base bullets (.17 to .30 caliber). Miller consistently required 1–3" faster twist than Berger's empirical data, with individual ratios (Berger T / Miller T) ranging from 1.10 to 1.29 (mean 1.21, std 0.057). A factor of 1.15 (mean − 1σ) was chosen as the applied correction, ensuring the corrected Sg remains conservative for approximately 84% of the dataset. This correction is derived from flat-base data only. Round-nose bullets share the absence of a boat tail but have a fundamentally different nose geometry that shifts the center of pressure forward, potentially increasing C<sub>Mα</sub> relative to flat-base designs. In the absence of comparable empirical data for round-nose bullets, the correction factor cannot be reliably extended to that geometry — manufacturer twist rate recommendations should be consulted instead.</span>
       <br><br>
       <span style="font-size:12px;">‡ <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft G1 C<sub>d</sub>(M) tables (79 points) and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. G7 BC is used when available (recommended for boattail bullets); G1 BC is used as fallback. The transonic threshold is Mach 1.0 (~340 m/s at ISA). Beyond this distance the Miller formula is no longer valid and actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
+      <br><br>
+      <span style="font-size:12px;">§ <strong>G1→G7 conversion factor (1.95):</strong> The Litz (2009) factors commonly cited in literature (1.43–1.60 by bullet type) were derived from early live-fire chronograph data and do not reflect modern radar-based measurements. Analysis of manufacturer-published Doppler/radar data shows a consistent G1/G7 ratio of approximately 1.95–2.00 across all pointed boattail constructions regardless of bullet type:<br>
+      <span style="display:grid;grid-template-columns:1fr auto auto;gap:2px 16px;margin-top:6px;font-family:var(--mono);">
+        <span style="color:var(--muted)">Source</span><span style="color:var(--muted)">Type</span><span style="color:var(--muted)">Ratio (mean ± std)</span>
+        <span>Berger (n=8)</span><span>VLD/Hybrid BT</span><span>1.951 ± 0.003</span>
+        <span>Nosler AccuBond LR (n=13)</span><span>VLD BT hunting</span><span>1.986 ± 0.003</span>
+        <span>Lapua Scenar (n=5)</span><span>HPBT/OTM</span><span>1.998 ± 0.005</span>
+        <span>Hornady ELD-X/M (n=6)</span><span>Polymer tip BT</span><span>1.975 ± 0.014</span>
+      </span><br>
+      A factor of 1.95 is used as a conservative lower bound. For best accuracy, enter a measured G7 BC directly — the estimator is a fallback when only G1 is known.</span>
     </div>
   </div>
 </section>
@@ -988,7 +996,7 @@ function toHpa(val, unit)     { return unit==='inHg' ? val*33.8639 : val; }
 // ─────────────────────────────────────────────
 //  G1→G7 CONVERSION FACTORS
 // ─────────────────────────────────────────────
-const G1G7 = { '1':1.52, '2':1.43, '3':1.60, '4':null, '5':null };
+const G1G7 = { '1':1.95, '2':null, '3':null };
 
 // ─────────────────────────────────────────────
 //  CORE MILLER CALCULATION
@@ -1299,13 +1307,13 @@ function renderSgScale(Sg, btype) {
   const label = document.getElementById('sg-val-lbl');
 
   // For flat-base, show arrow at corrected Sg
-  const isFlatBase = (btype === '4');
+  const isFlatBase = (btype === '2');
   const SgDisplay = isFlatBase ? Sg * 1.15 : Sg;
 
   const pct = Math.min(Math.max(SgDisplay / maxSg, 0), 1) * 100;
   arrow.style.left = pct + '%';
   label.style.left = pct + '%';
-  const isRoundNose = (btype === '5');
+  const isRoundNose = (btype === '3');
   const tag = isFlatBase ? '(corrected)' : isRoundNose ? '(uncorrected)' : '';
   label.innerHTML = 'Sg = ' + SgDisplay.toFixed(4)
     + (tag ? ' <span style="font-size:11px;color:var(--muted);font-weight:400;">' + tag + '</span>' : '');
@@ -1413,11 +1421,11 @@ function renderResults(r, units) {
     + '</div>';
   // Flat-base / round-nose correction note
   var btype = document.getElementById('bullet-type').value;
-  if (btype === '4') {
+  if (btype === '2') {
     var SgCorr = (Sg * 1.15).toFixed(4);
     var sgCorrClass = (Sg * 1.15) >= 1.5 ? 'green' : (Sg * 1.15) >= 1.3 ? 'orange' : 'red';
     html += row('Sg (FB corrected †)', '\u00d71.15 empirical', SgCorr, sgCorrClass);
-  } else if (btype === '5') {
+  } else if (btype === '3') {
     html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected †)</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
   }
   html += '</div>';
@@ -1536,8 +1544,8 @@ function updateAtmMap() {
   // Update section label with correction note
   const atmLabel = document.querySelector('#atm-section .section-label');
   if (atmLabel) {
-    const tag = btype === '4' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(corrected)</span>'
-              : btype === '5' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(uncorrected)</span>'
+    const tag = btype === '2' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(corrected)</span>'
+              : btype === '3' ? ' <span style="font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400;">(uncorrected)</span>'
               : '';
     atmLabel.innerHTML = '03 — Atmospheric Stability Map' + tag;
   }
@@ -1553,7 +1561,7 @@ function updateAtmMap() {
       const p_hp = dispToHpa(pressD[pi]);
       const r    = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype);
       const sgRaw = r.Sg;
-      const sgPlot = (btype === '4') ? sgRaw * 1.15 : sgRaw;
+      const sgPlot = (btype === '2') ? sgRaw * 1.15 : sgRaw;
       heatData.push({ x: tempsD[ti], y: pressD[pi], sg: sgPlot });
     }
   }
@@ -1710,7 +1718,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      Last updated: April 8, 2026 (v1.4 — twist solver bugfix: fv·f_atm in numerator; floor rounding for conservative display; minimum twist threshold corrected to Sg ≥ 1.3) &nbsp;·&nbsp;
+      Last updated: April 8, 2026 (v1.5 — G1→G7 factor unified to 1.95 for all pointed BT types, based on radar-measured manufacturer data) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
   </div>
@@ -1724,7 +1732,7 @@ document.getElementById('about-modal').addEventListener('click', function(e) {
 // Show/hide flat-base note based on bullet type selection
 document.getElementById('bullet-type').addEventListener('change', function() {
   var note = document.getElementById('flatbase-note');
-  note.style.display = (this.value === '4' || this.value === '5') ? 'block' : 'none';
+  note.style.display = (this.value === '2' || this.value === '3') ? 'block' : 'none';
 });
 
 // Replace comma with dot on all decimal inputs (fixes iOS keyboard)

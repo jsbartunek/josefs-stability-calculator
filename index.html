@@ -1138,7 +1138,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   }
 
   const use_g7  = bc_g7_eff !== null && bc_g7_eff > 0;
-  const bc_tran = use_g7 ? bc_g7_eff : bc_g1;
+  const bc_tran = use_g7 ? (bc_g7_korr !== null ? bc_g7_korr : bc_g7_eff) : bc_eff;
   const transonic_m   = calcTransonic(v0_ms, bc_tran, use_g7, T_C, P_hPa);
   const transonic_yd  = transonic_m * 1.09361;
   const transonic_src = use_g7 ? 'G7' : 'G1';

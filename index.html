@@ -636,6 +636,23 @@ Longer bullets require faster twist rates to stabilize.<br><br>
 
       <div class="field">
         <div class="field-label">
+          Polymer tip length
+          <button class="tip-btn">?<div class="tip-box"><b>Polymer Tip Length</b><br>
+Length of the polymer/plastic tip only — measured from bullet tip to where the metal jacket begins.<br><br>
+Leave at <b>0</b> to use the standard Miller formula with full bullet length. This gives a conservative (lower) estimate of S<sub>g</sub> for polymer-tipped bullets.<br><br>
+Enter a measured value to apply the <b>Courtney–Miller (2012)</b> correction for a more accurate S<sub>g</sub>.<br><br>
+<span style="color:var(--accent);">For polymer-tipped bullets, measuring and entering the tip length is recommended for best accuracy.</span><br><br>
+<span style="color:var(--muted);">See footnote ¶ below for full details.</span></div></button>
+        </div>
+        <input type="text" inputmode="decimal" id="tip-len" value="0" step="0.001" min="0">
+        <select id="tip-len-unit" onchange="convertField('tip-len', this)">
+          <option value="inch" selected>in</option>
+          <option value="mm">mm</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
           Bullet weight
           <button class="tip-btn">?<div class="tip-box"><b>Bullet Weight</b><br>
 Total mass of the bullet.<br>
@@ -855,7 +872,8 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
     <div class="formula-block">
       <div class="f-row"><span class="f-name">Twist (calibers):</span><span class="f-eq">t = T / D</span></div>
       <div class="f-row"><span class="f-name">Length (calibers):</span><span class="f-eq">lc = L / D</span></div>
-      <div class="f-row"><span class="f-name">Sg (uncorrected):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc·(1+lc²))</span></div>
+      <div class="f-row"><span class="f-name">Sg (standard):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc·(1+lc²))</span></div>
+      <div class="f-row"><span class="f-name">Sg (Courtney ¶):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc_total·(1+lc_metal²)) &nbsp;[lc_metal = (L−tip)/D]</span></div>
       <div class="f-row"><span class="f-name">Velocity factor:</span><span class="f-eq">fv = (v / 2800)^(1/3)  &nbsp;[v in fps]</span></div>
       <div class="f-row"><span class="f-name">Atm. correction *:</span><span class="f-eq">f_atm = √( (760/P_mmHg) · (T_K/288.15) )</span></div>
       <div class="f-row"><span class="f-name">Sg (corrected):</span><span class="f-eq">Sg = Sg₀ · fv · f_atm</span></div>
@@ -872,6 +890,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <strong style="color:var(--text);">References:</strong><br>
       Miller, D.G. (2005). <em>A New Rule for Estimating Rifling Twist.</em> Precision Shooting.<br>
       Miller, D.G. (2009). <em>How Good Are Simple Rules for Estimating Rifle Twist.</em> Precision Shooting.<br>
+      Courtney, M. &amp; Miller, D.G. (2012). <em>A Stability Formula for Plastic-Tipped Bullets.</em> Precision Shooting.<br>
       Litz, B. (2015). <em>How Ballistic Coefficient Varies with Twist Rate.</em> Applied Ballistics.<br>
       Validated against <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank">Berger Twist Rate Calculator</a>.
       <br><br>
@@ -891,7 +910,9 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       </span><br>
       A factor of 1.95 is used as a conservative lower bound. For best accuracy, enter a measured G7 BC directly — the estimator is a fallback when only G1 is known.</span>
       <br><br>
-      <span style="font-size:12px;">¶ <strong>Polymer-tip bullets and Miller conservatism:</strong> Miller's stability formula uses total bullet length to estimate the aerodynamic overturning moment (C<sub>Mα</sub>). For bullets with a low-density polymer tip (e.g. Hornady InterBond, ELD-X, Nosler AccuBond), the tip contributes to geometric length but adds negligible mass, leaving the centre of mass further rearward than geometry alone suggests. This causes Miller to overestimate C<sub>Mα</sub> and therefore overestimate the twist rate required for stability — meaning calculated S<sub>g</sub> may be conservatively low for these designs. Hornady's 4DOF calculator accounts for this by using measured aerodynamic coefficients per bullet; Miller-based tools (including this one, JBM, and Berger) do not. If a polymer-tip bullet shows marginal S<sub>g</sub> (1.3–1.5) but performs stably at the range, this is the likely explanation.</span>
+      <span style="font-size:12px;">¶ <strong>Polymer-tip bullets and Miller conservatism:</strong> Miller's stability formula uses total bullet length to estimate the aerodynamic overturning moment (C<sub>Mα</sub>). For bullets with a low-density polymer tip (e.g. Hornady InterBond, ELD-X, Nosler AccuBond), the tip contributes to geometric length but adds negligible mass, leaving the centre of mass further rearward than geometry alone suggests. This causes Miller to overestimate C<sub>Mα</sub> and therefore overestimate the twist rate required for stability — meaning calculated S<sub>g</sub> may be conservatively low for these designs. The effect is typically 15–30% on S<sub>g</sub>.<br><br>
+      Courtney &amp; Miller (2012, <em>Precision Shooting</em>) published a correction: substitute only the metal portion length (total length minus tip) in the (1+l²) overturning moment term, while retaining total length elsewhere. This calculator implements that correction when a non-zero polymer tip length is entered. Leaving the tip field at 0 uses the standard Miller formula with full bullet length — a conservative estimate suitable when the tip length is unknown.<br><br>
+      Hornady's 4DOF calculator accounts for tip geometry through measured per-bullet aerodynamic coefficients; Miller-based tools apply the Courtney correction as a practical approximation. If a polymer-tip bullet shows marginal S<sub>g</sub> (1.3–1.5) under standard Miller but performs stably at the range, entering the measured tip length will typically bring the calculated value into agreement with observed behaviour.</span>
     </div>
   </div>
 </section>
@@ -913,6 +934,7 @@ let atmChart   = null;
 const BSC_INPUTS = [
   'caliber','caliber-unit',
   'bullet-len','bullet-len-unit',
+  'tip-len','tip-len-unit',
   'bullet-wt','bullet-wt-unit',
   'bc-g1','bc-g7','bullet-type',
   'twist','twist-unit',
@@ -1007,13 +1029,21 @@ const G1G7 = { '1':1.95, '2':null, '3':null };
 //  All inputs in: inch, gr, fps, °C, hPa
 //  Returns object with all results
 // ─────────────────────────────────────────────
-function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7_in, btype) {
+function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7_in, btype, tip_in) {
   const D     = D_in;
   const L     = L_in;
   const t_cal = twist_in / D;
   const lc    = L / D;
 
-  const Sg_uncorr = (30 * m_gr) / (t_cal*t_cal * D*D*D * lc * (1 + lc*lc));
+  // Courtney–Miller (2012): if polymer tip length provided,
+  // use metal-only length in the (1 + lc²) overturning moment term,
+  // but retain total lc for the leading lc term (mass distribution).
+  // If tip_in = 0, reduces to standard Miller.
+  const tip   = (tip_in && tip_in > 0 && tip_in < L) ? tip_in : 0;
+  const lc_metal = (L - tip) / D;
+  const courtney = tip > 0;
+
+  const Sg_uncorr = (30 * m_gr) / (t_cal*t_cal * D*D*D * lc * (1 + lc_metal*lc_metal));
 
   const mv_fps_val = mv_fps;
   const fv    = Math.pow(mv_fps_val / 2800, 1/3);
@@ -1044,9 +1074,9 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   }
 
   // Stable/Minimum twist
-  const t_opt_cal = Math.sqrt((30*m_gr*fv*f_atm) / (1.5*D*D*D*lc*(1+lc*lc)));
+  const t_opt_cal = Math.sqrt((30*m_gr*fv*f_atm) / (1.5*D*D*D*lc*(1+lc_metal*lc_metal)));
   const T_opt = t_opt_cal * D;
-  const t_min_cal = Math.sqrt((30*m_gr*fv*f_atm) / (1.3*D*D*D*lc*(1+lc*lc)));
+  const t_min_cal = Math.sqrt((30*m_gr*fv*f_atm) / (1.3*D*D*D*lc*(1+lc_metal*lc_metal)));
   const T_min = t_min_cal * D;
 
   // Sectional density
@@ -1147,7 +1177,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   const transonic_yd  = transonic_m * 1.09361;
   const transonic_src = use_g7 ? 'G7' : 'G1';
 
-  return { D, lc, t_cal, Sg_uncorr, fv, f_atm, Sg, bc_eff, bc_pct,
+  return { D, lc, lc_metal, courtney, t_cal, Sg_uncorr, fv, f_atm, Sg, bc_eff, bc_pct,
            bc_g7_eff, bc_g7_korr, g7_source, T_opt, T_min, SD, drift,
            bc_g1, m_gr, L, twist_in, mv_fps: mv_fps_val, T_C, P_hPa,
            transonic_m, transonic_yd, transonic_src };
@@ -1168,6 +1198,7 @@ function parseNum(str) {
 var unitConverters = {
   'caliber':    { units: ['inch', 'mm'],     fn: convLength  },
   'bullet-len': { units: ['inch', 'mm'],     fn: convLength  },
+  'tip-len':    { units: ['inch', 'mm'],     fn: convLength  },
   'bullet-wt':  { units: ['gr', 'g'],        fn: convWeight  },
   'twist':      { units: ['inch', 'mm'],     fn: convLength  },
   'mv':         { units: ['fps', 'ms'],      fn: convVelocity},
@@ -1255,7 +1286,7 @@ function convertField(fieldId, selectEl) {
 
 // Initialize data-prev on all unit selects so first change works correctly
 document.addEventListener('DOMContentLoaded', function() {
-  ['caliber-unit','bullet-len-unit','bullet-wt-unit',
+  ['caliber-unit','bullet-len-unit','tip-len-unit','bullet-wt-unit',
    'twist-unit','mv-unit','temp-unit','press-unit'].forEach(function(id) {
     var sel = document.getElementById(id);
     if (sel) sel.dataset.prev = sel.value;
@@ -1270,6 +1301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function calculate() {
   const D_in    = toInch(parseNum(document.getElementById('caliber').value),    document.getElementById('caliber-unit').value);
   const L_in    = toInch(parseNum(document.getElementById('bullet-len').value), document.getElementById('bullet-len-unit').value);
+  const tip_in  = toInch(parseNum(document.getElementById('tip-len').value),    document.getElementById('tip-len-unit').value);
   const m_gr    = toGr  (parseNum(document.getElementById('bullet-wt').value),  document.getElementById('bullet-wt-unit').value);
   const twist_in= toInch(parseNum(document.getElementById('twist').value),      document.getElementById('twist-unit').value);
   const mv_fps  = toFps (parseNum(document.getElementById('mv').value),         document.getElementById('mv-unit').value);
@@ -1288,8 +1320,8 @@ function calculate() {
     press: document.getElementById('press-unit').value,
     caliber: document.getElementById('caliber-unit').value,
   };
-  const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7, btype);
-  lastParams = { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa };
+  const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7, btype, tip_in);
+  lastParams = { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa, tip_in };
 
   renderSgScale(r.Sg, btype);
   renderResults(r, units);
@@ -1406,10 +1438,14 @@ function renderResults(r, units) {
     + '<i>d</i> = diameter (inches)<br>'
     + '<i>l</i> = length (calibers)<br>'
     + '<i>fv</i> = (v/2800)^(1/3)<br>'
-    + '<i>f_atm</i> = √(760/P × T/288.15)'
+    + '<i>f_atm</i> = √(760/P × T/288.15)<br><br>'
+    + (r.courtney
+        ? '<span style="color:var(--accent);">Courtney–Miller (2012) active:</span> metal-only length used in (1+l²) term — polymer tip excluded from overturning moment.'
+        : 'Polymer tip length = 0: standard Miller formula using full bullet length (conservative for polymer-tipped bullets). See footnote ¶.')
     + '</div></button>';
+  var sgLabel = r.courtney ? 'Sg (Courtney–Miller ¶)' : 'Sg';
   html += '<div class="sum-row">'
-    + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">Sg' + sgTip + '</span>'
+    + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">' + sgLabel + sgTip + '</span>'
     + '<span></span>'
     + '<span class="sum-val ' + sgClass + '">' + Sg.toFixed(4) + '</span>'
     + '</div>';
@@ -1717,12 +1753,13 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="font-family:var(--mono);font-size:11px;color:var(--muted);">
       Based on: Miller, D.G. (2005, 2009). <i>Precision Shooting.</i><br>
+      Courtney, M. &amp; Miller, D.G. (2012). <i>Precision Shooting.</i><br>
       Litz, B. (2015). <i>Applied Ballistics.</i>
     </div>
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      Last updated: April 9, 2026 (v1.6 — added footnote on polymer-tip bullet conservatism in Miller stability estimates) &nbsp;·&nbsp;
+      Last updated: April 9, 2026 (v1.7 — Courtney–Miller (2012) polymer tip correction added; polymer tip length input field) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
   </div>

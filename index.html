@@ -622,10 +622,10 @@ Used internally as <i>d</i> (inches) in all stability calculations.</div></butto
         <div class="field-label">
           Bullet length
           <button class="tip-btn">?<div class="tip-box"><b>Bullet Length</b><br>
-Total length from tip to base of the bullet.<br>
+Total length from tip to base — as listed in manufacturer specifications.<br>
 Converted to calibers: <i>l = L / d</i><br>
 Longer bullets require faster twist rates to stabilize.<br><br>
-<span style="color:var(--accent);">¶ Polymer-tip note:</span> Calculated S<sub>g</sub> may be conservatively low for bullets with a polymer tip. If entering a separate polymer tip length, measure and enter the metal portion only here. See footnote ¶ below.</div></button>
+<span style="color:var(--accent);">¶ Polymer-tip note:</span> Enter total bullet length here. If you also enter a polymer tip length below, the app automatically subtracts it to compute the effective metal length for the Courtney–Miller correction. See footnote ¶ below.</div></button>
         </div>
         <input type="text" inputmode="decimal" id="bullet-len" value="1.299" step="0.001" min="0.1">
         <select id="bullet-len-unit" onchange="convertField('bullet-len', this)">
@@ -639,9 +639,9 @@ Longer bullets require faster twist rates to stabilize.<br><br>
           Polymer tip length
           <button class="tip-btn">?<div class="tip-box"><b>Polymer Tip Length</b><br>
 Length of the polymer/plastic tip only — measured from bullet tip to where the metal jacket begins.<br><br>
-Leave at <b>0</b> to use the standard Miller formula with full bullet length. This gives a conservative (lower) estimate of S<sub>g</sub> for polymer-tipped bullets.<br><br>
-Enter a measured value to apply the <b>Courtney–Miller (2012)</b> correction for a more accurate S<sub>g</sub>.<br><br>
-<span style="color:var(--accent);">For polymer-tipped bullets, measuring and entering the tip length is recommended for best accuracy.</span><br><br>
+<b>This value is subtracted from the total bullet length</b> to compute the effective metal length used in the Courtney–Miller (2012) overturning moment correction. Enter total bullet length above as usual.<br><br>
+Leave at <b>0</b> to use the standard Miller formula with full bullet length — a conservative (lower) S<sub>g</sub> estimate.<br><br>
+<span style="color:var(--accent);">For polymer-tipped bullets, entering the tip length is recommended for best accuracy.</span><br><br>
 <span style="color:var(--muted);">See footnote ¶ below for full details.</span></div></button>
         </div>
         <input type="text" inputmode="decimal" id="tip-len" value="0" step="0.001" min="0">
@@ -911,7 +911,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       A factor of 1.95 is used as a conservative lower bound. For best accuracy, enter a measured G7 BC directly — the estimator is a fallback when only G1 is known.</span>
       <br><br>
       <span style="font-size:12px;">¶ <strong>Polymer-tip bullets and Miller conservatism:</strong> Miller's stability formula uses total bullet length to estimate the aerodynamic overturning moment (C<sub>Mα</sub>). For bullets with a low-density polymer tip (e.g. Hornady InterBond, ELD-X, Nosler AccuBond), the tip contributes to geometric length but adds negligible mass, leaving the centre of mass further rearward than geometry alone suggests. This causes Miller to overestimate C<sub>Mα</sub> and therefore overestimate the twist rate required for stability — meaning calculated S<sub>g</sub> may be conservatively low for these designs. The effect is typically 15–30% on S<sub>g</sub>.<br><br>
-      Courtney &amp; Miller (2012, <em>Precision Shooting</em>) published a correction: substitute only the metal portion length (total length minus tip) in the (1+l²) overturning moment term, while retaining total length elsewhere. This calculator implements that correction when a non-zero polymer tip length is entered. Leaving the tip field at 0 uses the standard Miller formula with full bullet length — a conservative estimate suitable when the tip length is unknown.<br><br>
+      Courtney &amp; Miller (2012, <em>Precision Shooting</em>) published a correction: substitute only the metal portion length (total length minus tip) in the (1+l²) overturning moment term, while retaining total length elsewhere. This calculator implements that correction automatically — enter total bullet length and the polymer tip length separately, and the app subtracts the tip to compute the effective metal length. Leaving the tip field at 0 uses the standard Miller formula with full bullet length — a conservative estimate suitable when the tip length is unknown.<br><br>
       Hornady's 4DOF calculator accounts for tip geometry through measured per-bullet aerodynamic coefficients; Miller-based tools apply the Courtney correction as a practical approximation. If a polymer-tip bullet shows marginal S<sub>g</sub> (1.3–1.5) under standard Miller but performs stably at the range, entering the measured tip length will typically bring the calculated value into agreement with observed behaviour.</span>
     </div>
   </div>

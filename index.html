@@ -963,11 +963,7 @@ function restoreInputs() {
       if (el && data[id] !== undefined) el.value = data[id];
     });
     // Trigger flatbase note if needed
-    var bt = document.getElementById('bullet-type');
-    if (bt) {
-      var note = document.getElementById('flatbase-note');
-      if (note) note.style.display = (bt.value === '4' || bt.value === '5') ? 'block' : 'none';
-    }
+    updateFlatbaseNote();
   } catch(e) {}
 }
 
@@ -1771,10 +1767,13 @@ document.getElementById('about-modal').addEventListener('click', function(e) {
   if (e.target === this) this.style.display = 'none';
 });
 // Show/hide flat-base note based on bullet type selection
-document.getElementById('bullet-type').addEventListener('change', function() {
+function updateFlatbaseNote() {
+  var bt   = document.getElementById('bullet-type');
   var note = document.getElementById('flatbase-note');
-  note.style.display = (this.value === '2' || this.value === '3') ? 'block' : 'none';
-});
+  if (bt && note) note.style.display = (bt.value === '2' || bt.value === '3') ? 'block' : 'none';
+}
+document.getElementById('bullet-type').addEventListener('change', updateFlatbaseNote);
+document.addEventListener('DOMContentLoaded', updateFlatbaseNote);
 
 // Replace comma with dot on all decimal inputs (fixes iOS keyboard)
 document.querySelectorAll("input[inputmode=\"decimal\"]").forEach(function(input) {

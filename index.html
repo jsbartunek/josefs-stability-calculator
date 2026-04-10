@@ -1545,7 +1545,7 @@ function renderDriftTable(drift) {
 // ─────────────────────────────────────────────
 function updateAtmMap() {
   if (!lastParams) return;
-  const { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa } = lastParams;
+  const { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa, tip_in } = lastParams;
 
   // Detect user's chosen units
   const tempUnit  = (document.getElementById('temp-unit')  || {value:'C'}).value;
@@ -1595,7 +1595,7 @@ function updateAtmMap() {
     for (let ti = 0; ti < nT; ti++) {
       const t_c  = dispToC(tempsD[ti]);
       const p_hp = dispToHpa(pressD[pi]);
-      const r    = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype);
+      const r    = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, t_c, p_hp, bc_g1, bc_g7, btype, tip_in);
       const sgRaw = r.Sg;
       const sgPlot = (btype === '2') ? sgRaw * 1.15 : sgRaw;
       heatData.push({ x: tempsD[ti], y: pressD[pi], sg: sgPlot });

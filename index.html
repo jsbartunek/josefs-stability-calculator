@@ -794,10 +794,10 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
     </div>
     <div class="sg-scale-bar" id="sg-bar"><div class="sg-seg-red"></div><div class="sg-seg-orange"></div><div class="sg-seg-green"></div></div>
     <div class="sg-labels"><span style="left:0.000%">0.0</span><span style="left:16.667%">0.5</span><span style="left:33.333%">1.0</span><span style="left:43.333%">1.3</span><span style="left:50.000%">1.5</span><span style="left:66.667%">2.0</span><span style="left:83.333%">2.5</span><span style="left:100.000%">3.0+</span></div>
-    <div style="font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;">
-      <span style="color:var(--red)">■ Sg &lt; 1.3 — Unstable</span>
-      <span style="color:var(--orange)">■ 1.3 ≤ Sg &lt; 1.5 — Marginal</span>
-      <span style="color:var(--green)">■ Sg ≥ 1.5 — Stable</span>
+    <div style="font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+      <span><span style="color:var(--red)">■</span> <b style="color:var(--red)">Sg &lt; 1.3 — Unstable.</b> Significant BC loss and accuracy degradation.</span>
+      <span><span style="color:var(--orange)">■</span> <b style="color:var(--orange)">1.3 ≤ Sg &lt; 1.5 — Marginal.</b> Stable bullet flight with reduced BC — use effective BC in trajectory calculations. <a href="#fn-bc" style="color:var(--muted)">††</a></span>
+      <span><span style="color:var(--green)">■</span> <b style="color:var(--green)">Sg ≥ 1.5 — Stable.</b> Full rated BC achieved.</span>
     </div>
   </div>
 </section>
@@ -900,7 +900,9 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <br><br>
       <span style="font-size:12px;">‡ <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft G1 C<sub>d</sub>(M) tables (79 points) and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. G7 BC is used when available (recommended for boattail bullets); G1 BC is used as fallback. The transonic threshold is Mach 1.0 (~340 m/s at ISA). Beyond this distance the Miller formula is no longer valid and actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
       <br><br>
-      <span style="font-size:12px;">§ <strong>G1→G7 conversion factor (1.95):</strong> The Litz (2009) factors commonly cited in literature (1.43–1.60 by bullet type) were derived from early live-fire chronograph data and do not reflect modern radar-based measurements. Analysis of manufacturer-published Doppler/radar data shows a consistent G1/G7 ratio of approximately 1.95–2.00 across all pointed boattail constructions regardless of bullet type:<br>
+      <span id="fn-bc" style="font-size:12px;">†† <strong>Marginal stability and BC degradation:</strong> A bullet is not unstable in the range 1.3 ≤ Sg &lt; 1.5 — it flies point-forward without tumbling. However, research by Litz (Applied Ballistics) and Sierra (Loading Manuals, 4th and 5th ed.) has shown that ballistic coefficient degrades measurably in this range, as the bullet's coning motion (precession and nutation) increases aerodynamic drag. True gyroscopic instability and tumbling only occurs below Sg = 1.0, while significant BC loss begins to appear below Sg ≈ 1.3. The threshold of 1.5 for "full BC" was established by Litz based on empirical measurements and reflects the point above which BC degradation becomes negligible. The corrected effective BC is shown in the results. For the most accurate trajectory predictions, use this value rather than the manufacturer's nominal BC when entering data into an external ballistics calculator.</span>
+
+      <br><br><span style="font-size:12px;">§ <strong>G1→G7 conversion factor (1.95):</strong> The Litz (2009) factors commonly cited in literature (1.43–1.60 by bullet type) were derived from early live-fire chronograph data and do not reflect modern radar-based measurements. Analysis of manufacturer-published Doppler/radar data shows a consistent G1/G7 ratio of approximately 1.95–2.00 across all pointed boattail constructions regardless of bullet type:<br>
       <span style="display:grid;grid-template-columns:1fr auto auto;gap:2px 16px;margin-top:6px;font-family:var(--mono);">
         <span style="color:var(--muted)">Source</span><span style="color:var(--muted)">Type</span><span style="color:var(--muted)">Ratio (mean ± std)</span>
         <span>Berger (n=8)</span><span>VLD/Hybrid BT</span><span>1.951 ± 0.003</span>
@@ -1733,7 +1735,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
     <div style="font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:16px;">About this calculator</div>
 
     <p style="color:var(--text);font-size:14px;margin-bottom:16px;">
-      Developed by a Swedish hunter and handloader, this tool is designed to evaluate bullet stability under realistic shooting conditions, with a focus on practical implications rather than purely theoretical values. It implements the <b>Miller Twist Rule</b> (2005, 2009), extended with outputs such as BC degradation and spin drift — making the consequences of insufficient stability explicit.<br><br>The goal is not only to compute a stability factor (S<sub>g</sub>), but to show what that value actually means in practice. The aim is to support informed decisions when selecting bullet length, weight, and twist rate — and to build intuition for how stability affects real-world performance.<br><br>Results have been verified against the excellent calculators at <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank" style="color:var(--accent2);">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank" style="color:var(--accent2);">Berger Twist Rate Calculator</a>, both of which deserve full credit for making ballistic science accessible to shooters.
+      Developed by a Czech-Swedish hunter and handloader, this tool is designed to evaluate bullet stability under realistic shooting conditions, with a focus on practical implications rather than purely theoretical values. It implements the <b>Miller Twist Rule</b> (2005, 2009), extended with outputs such as BC degradation and spin drift — making the consequences of insufficient stability explicit.<br><br>The goal is not only to compute a stability factor (S<sub>g</sub>), but to show what that value actually means in practice. The aim is to support informed decisions when selecting bullet length, weight, and twist rate — and to build intuition for how stability affects real-world performance.<br><br>Results have been verified against the excellent calculators at <a href="https://www.jbmballistics.com/cgi-bin/jbmstab-5.1.cgi" target="_blank" style="color:var(--accent2);">JBM Stability Calculator</a> and <a href="https://bergerbullets.com/twist-rate-calculator/" target="_blank" style="color:var(--accent2);">Berger Twist Rate Calculator</a>, both of which deserve full credit for making ballistic science accessible to shooters.
     </p>
 
     <p style="color:var(--text);font-size:14px;margin-bottom:16px;">
@@ -1754,7 +1756,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
     </div>
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
-      Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
+      © 2026 Josef Ström Bartůněk · Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
       Last updated: April 9, 2026 (v1.7 — Courtney–Miller (2012) polymer tip correction added; polymer tip length input field) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>

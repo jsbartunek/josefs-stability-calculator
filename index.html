@@ -324,8 +324,7 @@
   }
   .sg-seg-red    { background: #e05a5a; width: 43.333%; border-radius: 3px 0 0 3px; flex-shrink: 0; }
   .sg-seg-orange { background: #e8943a; width: 6.667%;  flex-shrink: 0; }
-  .sg-seg-green  { background: #4caf7d; width: 16.667%; flex-shrink: 0; }
-  .sg-seg-blue   { background: #4fc3f7; flex: 1;        border-radius: 0 3px 3px 0; }
+  .sg-seg-green  { background: #4caf7d; flex: 1;        border-radius: 0 3px 3px 0; }
   .sg-labels {
     position: relative;
     height: 16px;
@@ -447,7 +446,6 @@
   .results-header.green  { background: rgba(76,175,125,0.15); color: var(--green); border-bottom: 1px solid rgba(76,175,125,0.3); }
   .results-header.orange { background: rgba(232,148,58,0.15);  color: var(--orange); border-bottom: 1px solid rgba(232,148,58,0.3); }
   .results-header.red    { background: rgba(224,90,90,0.15);   color: var(--red); border-bottom: 1px solid rgba(224,90,90,0.3); }
-  .results-header.blue   { background: rgba(79,195,247,0.15);  color: var(--accent2); border-bottom: 1px solid rgba(79,195,247,0.3); }
 
   @media (max-width: 480px) { .results-grid { grid-template-columns: 1fr 1fr; } }
   .results-grid {
@@ -627,7 +625,7 @@ Used internally as <i>d</i> (inches) in all stability calculations.</div></butto
 Total length from tip to base — as listed in manufacturer specifications.<br>
 Converted to calibers: <i>l = L / d</i><br>
 Longer bullets require faster twist rates to stabilize.<br><br>
-<span style="color:var(--accent);">[1] Polymer-tip note:</span> Enter total bullet length here. If you also enter a polymer tip length below, the app automatically subtracts it to compute the effective metal length for the Courtney–Miller correction. See <a href="#fn1" class="fn-link">[1]</a> below.</div></button>
+<span style="color:var(--accent);">¶ Polymer-tip note:</span> Enter total bullet length here. If you also enter a polymer tip length below, the app automatically subtracts it to compute the effective metal length for the Courtney–Miller correction. See footnote ¶ below.</div></button>
         </div>
         <input type="text" inputmode="decimal" id="bullet-len" value="1.299" step="0.001" min="0.1">
         <select id="bullet-len-unit" onchange="convertField('bullet-len', this)">
@@ -644,7 +642,7 @@ Length of the polymer/plastic tip only — measured from bullet tip to where the
 <b>This value is subtracted from the total bullet length</b> to compute the effective metal length used in the Courtney–Miller (2012) overturning moment correction. Enter total bullet length above as usual.<br><br>
 Leave at <b>0</b> to use the standard Miller formula with full bullet length — a conservative (lower) S<sub>g</sub> estimate.<br><br>
 <span style="color:var(--accent);">For polymer-tipped bullets, entering the tip length is recommended for best accuracy.</span><br><br>
-<span style="color:var(--muted);">See <a href="#fn1" class="fn-link">[1]</a> below for full details.</span></div></button>
+<span style="color:var(--muted);">See footnote ¶ below for full details.</span></div></button>
         </div>
         <input type="text" inputmode="decimal" id="tip-len" value="0" step="0.001" min="0">
         <select id="tip-len-unit" onchange="convertField('tip-len', this)">
@@ -702,7 +700,7 @@ Used only when G7 BC = 0 (auto-estimate).<br>
 <span>Flat base</span><span style="text-align:right;color:var(--muted);">N/A</span>
 <span>Round nose</span><span style="text-align:right;color:var(--muted);">N/A</span>
 </span><br>
-Factor 1.95 applies to all pointed boat-tail bullets (polymer tip, VLD, hybrid, soft-point BT, HPBT/OTM). Based on radar-measured data from Berger, Nosler, Lapua and Hornady — see <a href="#fn2" class="fn-link">[2]</a> below.</div></button>
+Factor 1.95 applies to all pointed boat-tail bullets (polymer tip, VLD, hybrid, soft-point BT, HPBT/OTM). Based on radar-measured data from Berger, Nosler, Lapua and Hornady — see § below.</div></button>
         </div>
         <select id="bullet-type" style="width:auto;text-align:left;">
           <option value="1">Pointed boat-tail (all types)</option>
@@ -755,7 +753,7 @@ Part of atmospheric correction:<br>
 <code>f_atm = √( (760/P) × (T_K / 288.15) )</code><br>
 Higher temperature → lower air density → higher Sg.</div></button>
         </div>
-        <input type="text" inputmode="decimal" id="temp" value="59" step="1">
+        <input type="text" inputmode="text" id="temp" value="59" step="1">
         <select id="temp-unit"       onchange="convertField('temp',       this)">
           <option value="C">°C</option>
           <option value="F" selected>°F</option>
@@ -780,7 +778,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
 
     </div>
   </div>
-  <div id="flatbase-note" style="display:none;margin-top:14px;font-size:13px;color:var(--orange);line-height:1.5;">Note: The Miller formula underestimates Sg for flat-base bullets, causing it to suggest a faster twist rate than necessary. A corrected estimate (Sg × 1.15) is shown in the results — see <a href="#fn3" class="fn-link">[3]</a> below for methodology and limitations. For round-nose bullets, this correction does not apply; consult manufacturer data.</div>
+  <div id="flatbase-note" style="display:none;margin-top:14px;font-size:13px;color:var(--orange);line-height:1.5;">Note: The Miller formula underestimates Sg for flat-base bullets, causing it to suggest a faster twist rate than necessary. A corrected estimate (Sg × 1.15) is shown in the results — see footnote † in the formula reference section below for methodology and limitations. For round-nose bullets, this correction does not apply; consult manufacturer data.</div>
   <div style="margin-top:16px;">
     <button class="calc-btn" onclick="calculate()">CALCULATE STABILITY</button>
   </div>
@@ -794,13 +792,12 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <div class="sg-value-label" id="sg-val-lbl">Sg = —</div>
       <div class="sg-arrow" id="sg-arrow"></div>
     </div>
-    <div class="sg-scale-bar" id="sg-bar"><div class="sg-seg-red"></div><div class="sg-seg-orange"></div><div class="sg-seg-green"></div><div class="sg-seg-blue"></div></div>
+    <div class="sg-scale-bar" id="sg-bar"><div class="sg-seg-red"></div><div class="sg-seg-orange"></div><div class="sg-seg-green"></div></div>
     <div class="sg-labels"><span style="left:0.000%">0.0</span><span style="left:16.667%">0.5</span><span style="left:33.333%">1.0</span><span style="left:43.333%">1.3</span><span style="left:50.000%">1.5</span><span style="left:66.667%">2.0</span><span style="left:83.333%">2.5</span><span style="left:100.000%">3.0+</span></div>
     <div style="font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;margin-top:4px;">
       <span><span style="color:var(--red)">■</span> <b style="color:var(--red)">Sg &lt; 1.3 — Unstable.</b> Significant BC loss and accuracy degradation.</span>
-      <span><span style="color:var(--orange)">■</span> <b style="color:var(--orange)">1.3 ≤ Sg &lt; 1.5 — Marginal.</b> Stable bullet flight with reduced BC — use effective BC in trajectory calculations. <a href="#fn4" class="fn-link">[4]</a></span>
-      <span><span style="color:var(--green)">■</span> <b style="color:var(--green)">1.5 ≤ Sg ≤ 2.0 — Stable.</b> Full rated BC achieved. Optimal range.</span>
-      <span><span style="color:var(--accent2)">■</span> <b style="color:var(--accent2)">Sg &gt; 2.0 — High stability.</b> May indicate overstabilization — see <a href="#fn5" class="fn-link">[5]</a> for details.</span>
+      <span><span style="color:var(--orange)">■</span> <b style="color:var(--orange)">1.3 ≤ Sg &lt; 1.5 — Marginal.</b> Stable bullet flight with reduced BC — use effective BC in trajectory calculations. <a href="#fn-bc" style="color:var(--muted)">††</a></span>
+      <span><span style="color:var(--green)">■</span> <b style="color:var(--green)">Sg ≥ 1.5 — Stable.</b> Full rated BC achieved.</span>
     </div>
   </div>
 </section>
@@ -824,7 +821,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
     <div class="atm-controls">
       <div class="atm-row">
         <span class="atm-label">Temperature:</span>
-        <label><input type="text" inputmode="decimal" id="t-min" value="-4"> <span id="t-unit-lbl">°F</span></label>
+        <label><input type="text" inputmode="text" id="t-min" value="-4"> <span id="t-unit-lbl">°F</span></label>
         <span>—</span>
         <label><input type="text" inputmode="decimal" id="t-max" value="104"> <span id="t-unit-lbl2">°F</span></label>
       </div>
@@ -838,7 +835,7 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
     </div>
     <canvas id="atm-chart" height="280"></canvas>
     <div style="margin-top:10px;font-family:var(--mono);font-size:14px;color:var(--muted);display:flex;gap:24px;flex-wrap:wrap;">
-      <span style="display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:14px;"><span style="color:#e05a5a;">● Sg &lt; 1.3 — Unstable</span><span style="color:#e8943a;">● 1.3 ≤ Sg &lt; 1.5 — Marginal</span><span style="color:#4caf7d;">● 1.5 ≤ Sg ≤ 2.0 — Stable</span><span style="color:#4fc3f7;">● Sg &gt; 2.0 — High stability</span><span style="color:#954ce9;">● Current conditions</span></span>
+      <span style="display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:14px;"><span style="color:#e05a5a;">● Sg &lt; 1.3 — Unstable</span><span style="color:#e8943a;">● 1.3 ≤ Sg &lt; 1.5 — Marginal</span><span style="color:#4caf7d;">● Sg ≥ 1.5 — Stable</span><span style="color:#4fc3f7;">★ Current conditions</span></span>
     </div>
   </div>
 </section>
@@ -876,18 +873,18 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <div class="f-row"><span class="f-name">Twist (calibers):</span><span class="f-eq">t = T / D</span></div>
       <div class="f-row"><span class="f-name">Length (calibers):</span><span class="f-eq">lc = L / D</span></div>
       <div class="f-row"><span class="f-name">Sg (standard):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc·(1+lc²))</span></div>
-      <div class="f-row"><span class="f-name">Sg (Courtney <a href="#fn1" class="fn-link">[1]</a>):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc_total·(1+lc_metal²)) &nbsp;[lc_metal = (L−tip)/D]</span></div>
+      <div class="f-row"><span class="f-name">Sg (Courtney ¶):</span><span class="f-eq">Sg₀ = 30·m / (t²·D³·lc_total·(1+lc_metal²)) &nbsp;[lc_metal = (L−tip)/D]</span></div>
       <div class="f-row"><span class="f-name">Velocity factor:</span><span class="f-eq">fv = (v / 2800)^(1/3)  &nbsp;[v in fps]</span></div>
       <div class="f-row"><span class="f-name">Atm. correction *:</span><span class="f-eq">f_atm = √( (760/P_mmHg) · (T_K/288.15) )</span></div>
       <div class="f-row"><span class="f-name">Sg (corrected):</span><span class="f-eq">Sg = Sg₀ · fv · f_atm</span></div>
       <div class="f-row"><span class="f-name">Stable twist:</span><span class="f-eq">T_opt = D · √( 30·m·fv·f_atm / (1.5·D³·lc·(1+lc²)) )  &nbsp;[Sg = 1.5, displayed floor to 0.01"]</span></div>
       <div class="f-row"><span class="f-name">Minimum twist:</span><span class="f-eq">T_min = D · √( 30·m·fv·f_atm / (1.3·D³·lc·(1+lc²)) )  &nbsp;[Sg = 1.3, displayed floor to 0.01"]</span></div>
       <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
-      <div class="f-row"><span class="f-name">G1→G7 estimate <a href="#fn2" class="fn-link">[2]</a>:</span><span class="f-eq">BC_G7 = BC_G1 / 1.95  (all pointed BT types — see [2] below)</span></div>
+      <div class="f-row"><span class="f-name">G1→G7 estimate §:</span><span class="f-eq">BC_G7 = BC_G1 / 1.95  (all pointed BT types — see § below)</span></div>
       <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
-      <div class="f-row"><span class="f-name">Sg (flat-base <a href="#fn3" class="fn-link">[3]</a>):</span><span class="f-eq">Sg_corrected ≈ Sg × 1.15</span></div>
-      <div class="f-row"><span class="f-name">Polymer tip <a href="#fn1" class="fn-link">[1]</a>:</span><span class="f-eq">Sg may be underestimated — use polymer tip field to correct</span></div>
-      <div class="f-row"><span class="f-name">Transonic dist. <a href="#fn6" class="fn-link">[6]</a>:</span><span class="f-eq">a = (π/8)·ρv²C<sub>d</sub>(M) / BC<sub>SI</sub>  &nbsp;[Siacci/Ingalls]</span></div>
+      <div class="f-row"><span class="f-name">Sg (flat-base †):</span><span class="f-eq">Sg_corrected ≈ Sg × 1.15</span></div>
+      <div class="f-row"><span class="f-name">Polymer tip ¶:</span><span class="f-eq">Sg may be underestimated — see footnote ¶</span></div>
+      <div class="f-row"><span class="f-name">Transonic dist. ‡:</span><span class="f-eq">a = (π/8)·ρv²C<sub>d</sub>(M) / BC<sub>SI</sub>  &nbsp;[Siacci/Ingalls]</span></div>
     </div>
     <div class="refs">
       <strong style="color:var(--text);">References:</strong><br>
@@ -899,11 +896,13 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       <br><br>
       <span style="font-size:12px;">* Miller's original formula uses the linear atmospheric correction (P_std/P · T/T_std). This calculator implements the square root form √(P_std/P · T/T_std), consistent with JBM and Berger, which yields better empirical agreement in practice.</span>
       <br><br>
-      <span id="fn1" style="font-size:12px;">[1] <strong>Polymer-tip bullets and Miller conservatism:</strong> Miller's stability formula uses total bullet length to estimate the aerodynamic overturning moment (C<sub>Mα</sub>). For bullets with a low-density polymer tip (e.g. Hornady InterBond, ELD-X, Nosler AccuBond), the tip contributes to geometric length but adds negligible mass, leaving the centre of mass further rearward than geometry alone suggests. This causes Miller to overestimate C<sub>Mα</sub> and therefore overestimate the twist rate required for stability — meaning calculated S<sub>g</sub> may be conservatively low for these designs. The effect is typically 15–30% on S<sub>g</sub>.<br><br>
-      Courtney &amp; Miller (2012, <em>Precision Shooting</em>) published a correction: substitute only the metal portion length (total length minus tip) in the (1+l²) overturning moment term, while retaining total length elsewhere. This calculator implements that correction automatically — enter total bullet length and the polymer tip length separately, and the app subtracts the tip to compute the effective metal length. Leaving the tip field at 0 uses the standard Miller formula with full bullet length — a conservative estimate suitable when the tip length is unknown.<br><br>
-      Hornady's 4DOF calculator accounts for tip geometry through measured per-bullet aerodynamic coefficients; Miller-based tools apply the Courtney correction as a practical approximation. If a polymer-tip bullet shows marginal S<sub>g</sub> (1.3–1.5) under standard Miller but performs stably at the range, entering the measured tip length will typically bring the calculated value into agreement with observed behaviour.</span>
+      <span style="font-size:12px;">† <strong>Flat-base Sg correction (Sg × 1.15):</strong> Miller's denominator (1 + lc²) is empirically calibrated for boat-tail bullet geometry. For flat-base bullets, the aerodynamic overturning moment (C<sub>Mα</sub>) is lower, meaning actual gyroscopic stability is higher than Miller predicts. To derive a correction factor, Miller's minimum twist estimates were compared against Berger Bullets' published minimum twist rates for 13 flat-base bullets (.17 to .30 caliber). Miller consistently required 1–3" faster twist than Berger's empirical data, with individual ratios (Berger T / Miller T) ranging from 1.10 to 1.29 (mean 1.21, std 0.057). A factor of 1.15 (mean − 1σ) was chosen as the applied correction, ensuring the corrected Sg remains conservative for approximately 84% of the dataset. This correction is derived from flat-base data only. Round-nose bullets share the absence of a boat tail but have a fundamentally different nose geometry that shifts the center of pressure forward, potentially increasing C<sub>Mα</sub> relative to flat-base designs. In the absence of comparable empirical data for round-nose bullets, the correction factor cannot be reliably extended to that geometry — manufacturer twist rate recommendations should be consulted instead.</span>
       <br><br>
-      <span id="fn2" style="font-size:12px;">[2] <strong>G1→G7 conversion factor (1.95):</strong> The Litz (2009) factors commonly cited in literature (1.43–1.60 by bullet type) were derived from early live-fire chronograph data and do not reflect modern radar-based measurements. Analysis of manufacturer-published Doppler/radar data shows a consistent G1/G7 ratio of approximately 1.95–2.00 across all pointed boattail constructions regardless of bullet type:<br>
+      <span style="font-size:12px;">‡ <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft G1 C<sub>d</sub>(M) tables (79 points) and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. G7 BC is used when available (recommended for boattail bullets); G1 BC is used as fallback. The transonic threshold is Mach 1.0 (~340 m/s at ISA). Beyond this distance the Miller formula is no longer valid and actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
+      <br><br>
+      <span id="fn-bc" style="font-size:12px;">†† <strong>Marginal stability and BC degradation:</strong> A bullet is not unstable in the range 1.3 ≤ Sg &lt; 1.5 — it flies point-forward without tumbling. However, research by Litz (Applied Ballistics) and Sierra (Loading Manuals, 4th and 5th ed.) has shown that ballistic coefficient degrades measurably in this range, as the bullet's coning motion (precession and nutation) increases aerodynamic drag. True gyroscopic instability and tumbling only occurs below Sg = 1.0, while significant BC loss begins to appear below Sg ≈ 1.3. The threshold of 1.5 for "full BC" was established by Litz based on empirical measurements and reflects the point above which BC degradation becomes negligible. The corrected effective BC is shown in the results. For the most accurate trajectory predictions, use this value rather than the manufacturer's nominal BC when entering data into an external ballistics calculator.</span>
+
+      <br><br><span style="font-size:12px;">§ <strong>G1→G7 conversion factor (1.95):</strong> The Litz (2009) factors commonly cited in literature (1.43–1.60 by bullet type) were derived from early live-fire chronograph data and do not reflect modern radar-based measurements. Analysis of manufacturer-published Doppler/radar data shows a consistent G1/G7 ratio of approximately 1.95–2.00 across all pointed boattail constructions regardless of bullet type:<br>
       <span style="display:grid;grid-template-columns:1fr auto auto;gap:2px 16px;margin-top:6px;font-family:var(--mono);">
         <span style="color:var(--muted)">Source</span><span style="color:var(--muted)">Type</span><span style="color:var(--muted)">Ratio (mean ± std)</span>
         <span>Berger (n=8)</span><span>VLD/Hybrid BT</span><span>1.951 ± 0.003</span>
@@ -913,13 +912,9 @@ Lower pressure (high altitude) → lower air density → higher Sg.</div></butto
       </span><br>
       A factor of 1.95 is used as a conservative lower bound. For best accuracy, enter a measured G7 BC directly — the estimator is a fallback when only G1 is known.</span>
       <br><br>
-      <span id="fn3" style="font-size:12px;">[3] <strong>Flat-base Sg correction (Sg × 1.15):</strong> Miller's denominator (1 + lc²) is empirically calibrated for boat-tail bullet geometry. For flat-base bullets, the aerodynamic overturning moment (C<sub>Mα</sub>) is lower, meaning actual gyroscopic stability is higher than Miller predicts. To derive a correction factor, Miller's minimum twist estimates were compared against Berger Bullets' published minimum twist rates for 13 flat-base bullets (.17 to .30 caliber). Miller consistently required 1–3" faster twist than Berger's empirical data, with individual ratios (Berger T / Miller T) ranging from 1.10 to 1.29 (mean 1.21, std 0.057). A factor of 1.15 (mean − 1σ) was chosen as the applied correction, ensuring the corrected Sg remains conservative for approximately 84% of the dataset. This correction is derived from flat-base data only. Round-nose bullets share the absence of a boat tail but have a fundamentally different nose geometry that shifts the center of pressure forward, potentially increasing C<sub>Mα</sub> relative to flat-base designs. In the absence of comparable empirical data for round-nose bullets, the correction factor cannot be reliably extended to that geometry — manufacturer twist rate recommendations should be consulted instead.</span>
-      <br><br>
-      <span id="fn4" style="font-size:12px;">[4] <strong>Marginal stability and BC degradation:</strong> A bullet is not unstable in the range 1.3 ≤ Sg &lt; 1.5 — it flies point-forward without tumbling. However, research by Litz (Applied Ballistics) and Sierra (Loading Manuals, 4th and 5th ed.) has shown that ballistic coefficient degrades measurably in this range, as the bullet's coning motion (precession and nutation) increases aerodynamic drag. True gyroscopic instability and tumbling only occurs below Sg = 1.0, while significant BC loss begins to appear below Sg ≈ 1.3. The threshold of 1.5 for "full BC" was established by Litz based on empirical measurements and reflects the point above which BC degradation becomes negligible. The corrected effective BC is shown in the results. For the most accurate trajectory predictions, use this value rather than the manufacturer's nominal BC when entering data into an external ballistics calculator.</span>
-      <br><br>
-      <span id="fn5" style="font-size:12px;">[5] <strong>High stability (Sg &gt; 2.0):</strong> Whether high Sg causes practical problems is debated. Lapua and traditional sources recommend keeping Sg below 2.0, citing increased drag from nose-up flight and sensitivity to bullet imperfections. Berger/Litz counter that Doppler radar data shows higher Sg actually reduces drag, especially in the transonic region — the nose-up myth originates from high-angle artillery fire, not small arms ballistics. In practice, Sg 1.4–2.0 is the broadly agreed optimal window. Values above 2.0 are generally still accurate but represent an unnecessarily fast twist for the bullet used.</span>
-      <br><br>
-      <span id="fn6" style="font-size:12px;">[6] <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft G1 C<sub>d</sub>(M) tables (79 points) and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. G7 BC is used when available (recommended for boattail bullets); G1 BC is used as fallback. The transonic threshold is Mach 1.0 (~340 m/s at ISA). Beyond this distance the Miller formula is no longer valid and actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
+      <span style="font-size:12px;">¶ <strong>Polymer-tip bullets and Miller conservatism:</strong> Miller's stability formula uses total bullet length to estimate the aerodynamic overturning moment (C<sub>Mα</sub>). For bullets with a low-density polymer tip (e.g. Hornady InterBond, ELD-X, Nosler AccuBond), the tip contributes to geometric length but adds negligible mass, leaving the centre of mass further rearward than geometry alone suggests. This causes Miller to overestimate C<sub>Mα</sub> and therefore overestimate the twist rate required for stability — meaning calculated S<sub>g</sub> may be conservatively low for these designs. The effect is typically 15–30% on S<sub>g</sub>.<br><br>
+      Courtney &amp; Miller (2012, <em>Precision Shooting</em>) published a correction: substitute only the metal portion length (total length minus tip) in the (1+l²) overturning moment term, while retaining total length elsewhere. This calculator implements that correction automatically — enter total bullet length and the polymer tip length separately, and the app subtracts the tip to compute the effective metal length. Leaving the tip field at 0 uses the standard Miller formula with full bullet length — a conservative estimate suitable when the tip length is unknown.<br><br>
+      Hornady's 4DOF calculator accounts for tip geometry through measured per-bullet aerodynamic coefficients; Miller-based tools apply the Courtney correction as a practical approximation. If a polymer-tip bullet shows marginal S<sub>g</sub> (1.3–1.5) under standard Miller but performs stably at the range, entering the measured tip length will typically bring the calculated value into agreement with observed behaviour.</span>
     </div>
   </div>
 </section>
@@ -1358,8 +1353,7 @@ function renderSgScale(Sg, btype) {
     + (tag ? ' <span style="font-size:11px;color:var(--muted);font-weight:400;">' + tag + '</span>' : '');
 
   let hexCol;
-  if (SgDisplay > 2.0)       hexCol = '#4fc3f7';
-  else if (SgDisplay >= 1.5) hexCol = '#4caf7d';
+  if (SgDisplay >= 1.5)      hexCol = '#4caf7d';
   else if (SgDisplay >= 1.3) hexCol = '#e8943a';
   else                       hexCol = '#e05a5a';
 
@@ -1379,12 +1373,9 @@ function renderResults(r, units) {
   const hdr = document.getElementById('results-hdr');
 
   // ── Header bar ──
-  if (SgDisplay > 2.0) {
-    hdr.className = 'results-header blue';
-    hdr.textContent = '⚠ High Stability — Sg = ' + SgDisplay.toFixed(4) + '  (Sg > 2.0)';
-  } else if (SgDisplay >= 1.5) {
+  if (SgDisplay >= 1.5) {
     hdr.className = 'results-header green';
-    hdr.textContent = '✓ Stable — Sg = ' + SgDisplay.toFixed(4) + '  (Sg 1.5 – 2.0)';
+    hdr.textContent = '✓ Stable — Sg = ' + SgDisplay.toFixed(4) + '  (Sg ≥ 1.5)';
   } else if (SgDisplay >= 1.3) {
     hdr.className = 'results-header orange';
     hdr.textContent = '⚠ Marginally Stable — Sg = ' + SgDisplay.toFixed(4) + '  (1.3 ≤ Sg < 1.5)';
@@ -1393,7 +1384,7 @@ function renderResults(r, units) {
     hdr.textContent = '✗ Unstable — Sg = ' + SgDisplay.toFixed(4) + '  (Sg < 1.3)';
   }
 
-  const sgClass = SgDisplay>2.0 ? 'blue' : SgDisplay>=1.5 ? 'green' : SgDisplay>=1.3 ? 'orange' : 'red';
+  const sgClass = SgDisplay>=1.5 ? 'green' : SgDisplay>=1.3 ? 'orange' : 'red';
 
   // G7 strings
   const g7rated = r.bc_g7_eff  !== null ? r.bc_g7_eff.toFixed(3)  : 'N/A';
@@ -1450,9 +1441,9 @@ function renderResults(r, units) {
     + '<i>f_atm</i> = √(760/P × T/288.15)<br><br>'
     + (r.courtney
         ? '<span style="color:var(--accent);">Courtney–Miller (2012) active:</span> metal-only length used in (1+l²) term — polymer tip excluded from overturning moment.'
-        : 'Polymer tip length = 0: standard Miller formula using full bullet length (conservative for polymer-tipped bullets). See [1] below.')
+        : 'Polymer tip length = 0: standard Miller formula using full bullet length (conservative for polymer-tipped bullets). See footnote ¶.')
     + '</div></button>';
-  var sgLabel = r.courtney ? 'Sg (Courtney–Miller [1])' : 'Sg';
+  var sgLabel = r.courtney ? 'Sg (Courtney–Miller ¶)' : 'Sg';
   html += '<div class="sum-row">'
     + '<span class="sum-key" style="display:flex;align-items:center;gap:2px;">' + sgLabel + sgTip + '</span>'
     + '<span></span>'
@@ -1476,7 +1467,7 @@ function renderResults(r, units) {
     // Replace main Sg row label/value with corrected
     html = html.replace(
       '<span class="sum-val ' + sgClass + '">' + Sg.toFixed(4) + '</span>',
-      '<span class="sum-val ' + sgCorrClass + '">' + SgCorr.toFixed(4) + ' <span style="font-size:10px;color:var(--muted);">(FB corr. [3])</span></span>'
+      '<span class="sum-val ' + sgCorrClass + '">' + SgCorr.toFixed(4) + ' <span style="font-size:10px;color:var(--muted);">(FB corr. †)</span></span>'
     );
     html += row('Sg (Miller, uncorr.)', '', Sg.toFixed(4), 'muted');
     // Twist corrected: T_corr = T / sqrt(1.15)
@@ -1484,7 +1475,7 @@ function renderResults(r, units) {
     T_stable_disp = '1:' + (Math.floor(r.T_opt / fbFactor * 100) / 100).toFixed(2) + '" in';
     T_limit_disp  = '1:' + (Math.floor(r.T_min / fbFactor * 100) / 100).toFixed(2) + '" in';
   } else if (btype === '3') {
-    html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected [3])</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
+    html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected †)</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
     T_stable_disp = '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '" in';
     T_limit_disp  = '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in';
   } else {
@@ -1622,7 +1613,6 @@ function updateAtmMap() {
 
   // Color function
   function sgColor(sg, alpha=0.85) {
-    if (sg > 2.0)  return `rgba(79,195,247,${alpha})`;
     if (sg >= 1.5) return `rgba(76,175,125,${alpha})`;
     if (sg >= 1.3) return `rgba(232,148,58,${alpha})`;
     return `rgba(224,90,90,${alpha})`;
@@ -1633,7 +1623,7 @@ function updateAtmMap() {
   const starDataset = {
     label: 'Current',
     data: [{ x: starT, y: starP, r: 14 }],
-    backgroundColor: 'rgba(149,76,233,1.0)',
+    backgroundColor: 'rgba(79,195,247,1.0)',
     borderColor: 'white',
     borderWidth: 2.5,
     order: 1,
@@ -1774,7 +1764,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       © 2026 Josef Ström Bartůněk · Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      Last updated: April 11, 2026 (v1.8 — High stability warning added for Sg > 2.0; nuanced description reflecting debate in literature) &nbsp;·&nbsp;
+      Last updated: April 9, 2026 (v1.7 — Courtney–Miller (2012) polymer tip correction added; polymer tip length input field) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
   </div>

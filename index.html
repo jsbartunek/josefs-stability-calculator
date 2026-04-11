@@ -1466,7 +1466,7 @@ function renderResults(r, units) {
     html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected †)</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
   }
   html += row('Stable Twist',  'Sg \u2265 1.5', '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '" in');
-  html += row('Min. Twist', 'Sg \u2265 1.3', '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in');
+  html += row('Twist Limit', 'Sg \u2265 1.3', '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in');
   html += '</div>';
 
   // Ballistic Coefficients

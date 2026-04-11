@@ -1620,6 +1620,7 @@ function updateAtmMap() {
 
   // Color function
   function sgColor(sg, alpha=0.85) {
+    if (sg > 2.0)  return `rgba(79,195,247,${alpha})`;
     if (sg >= 1.5) return `rgba(76,175,125,${alpha})`;
     if (sg >= 1.3) return `rgba(232,148,58,${alpha})`;
     return `rgba(224,90,90,${alpha})`;

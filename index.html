@@ -1368,21 +1368,23 @@ function renderSgScale(Sg, btype) {
 function renderResults(r, units) {
   units = units || {};
   const Sg = r.Sg;
+  const btype = document.getElementById('bullet-type').value;
+  const SgDisplay = (btype === '2') ? Sg * 1.15 : Sg;
   const hdr = document.getElementById('results-hdr');
 
   // ── Header bar ──
-  if (Sg >= 1.5) {
+  if (SgDisplay >= 1.5) {
     hdr.className = 'results-header green';
-    hdr.textContent = '✓ Stable — Sg = ' + Sg.toFixed(4) + '  (Sg ≥ 1.5)';
-  } else if (Sg >= 1.3) {
+    hdr.textContent = '✓ Stable — Sg = ' + SgDisplay.toFixed(4) + '  (Sg ≥ 1.5)';
+  } else if (SgDisplay >= 1.3) {
     hdr.className = 'results-header orange';
-    hdr.textContent = '⚠ Marginally Stable — Sg = ' + Sg.toFixed(4) + '  (1.3 ≤ Sg < 1.5)';
+    hdr.textContent = '⚠ Marginally Stable — Sg = ' + SgDisplay.toFixed(4) + '  (1.3 ≤ Sg < 1.5)';
   } else {
     hdr.className = 'results-header red';
-    hdr.textContent = '✗ Unstable — Sg = ' + Sg.toFixed(4) + '  (Sg < 1.3)';
+    hdr.textContent = '✗ Unstable — Sg = ' + SgDisplay.toFixed(4) + '  (Sg < 1.3)';
   }
 
-  const sgClass = Sg>=1.5 ? 'green' : Sg>=1.3 ? 'orange' : 'red';
+  const sgClass = SgDisplay>=1.5 ? 'green' : SgDisplay>=1.3 ? 'orange' : 'red';
 
   // G7 strings
   const g7rated = r.bc_g7_eff  !== null ? r.bc_g7_eff.toFixed(3)  : 'N/A';
@@ -1457,16 +1459,31 @@ function renderResults(r, units) {
     + '<span class="sum-val orange">' + transonicStr + '</span>'
     + '</div>';
   // Flat-base / round-nose correction note
-  var btype = document.getElementById('bullet-type').value;
+  var T_stable_disp, T_limit_disp;
   if (btype === '2') {
-    var SgCorr = (Sg * 1.15).toFixed(4);
-    var sgCorrClass = (Sg * 1.15) >= 1.5 ? 'green' : (Sg * 1.15) >= 1.3 ? 'orange' : 'red';
-    html += row('Sg (FB corrected †)', '\u00d71.15 empirical', SgCorr, sgCorrClass);
+    // FB: corrected Sg is primary — swap main Sg with corrected, show uncorrected as secondary
+    var SgCorr = Sg * 1.15;
+    var sgCorrClass = SgCorr >= 1.5 ? 'green' : SgCorr >= 1.3 ? 'orange' : 'red';
+    // Replace main Sg row label/value with corrected
+    html = html.replace(
+      '<span class="sum-val ' + sgClass + '">' + Sg.toFixed(4) + '</span>',
+      '<span class="sum-val ' + sgCorrClass + '">' + SgCorr.toFixed(4) + ' <span style="font-size:10px;color:var(--muted);">(FB corr. †)</span></span>'
+    );
+    html += row('Sg (Miller, uncorr.)', '', Sg.toFixed(4), 'muted');
+    // Twist corrected: T_corr = T / sqrt(1.15)
+    var fbFactor = Math.sqrt(1.15);
+    T_stable_disp = '1:' + (Math.floor(r.T_opt / fbFactor * 100) / 100).toFixed(2) + '" in';
+    T_limit_disp  = '1:' + (Math.floor(r.T_min / fbFactor * 100) / 100).toFixed(2) + '" in';
   } else if (btype === '3') {
     html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected †)</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
+    T_stable_disp = '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '" in';
+    T_limit_disp  = '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in';
+  } else {
+    T_stable_disp = '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '" in';
+    T_limit_disp  = '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in';
   }
-  html += row('Twist Stable',  'Sg \u2265 1.5', '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '" in');
-  html += row('Twist Limit', 'Sg \u2265 1.3', '1:' + (Math.floor(r.T_min * 100) / 100).toFixed(2) + '" in');
+  html += row('Twist Stable', 'Sg ≥ 1.5', T_stable_disp);
+  html += row('Twist Limit',  'Sg ≥ 1.3', T_limit_disp);
   html += '</div>';
 
   // Ballistic Coefficients

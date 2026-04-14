@@ -81,13 +81,15 @@
   }
 
   header {
-    border-bottom: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
     padding: 14px 20px;
     background: var(--surface);
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    margin-bottom: 8px;
   }
   .header-spacer { flex: 1; min-width: 8px; }
   @media (max-width: 480px) {
@@ -579,6 +581,8 @@
 </head>
 <body>
 
+<main>
+
 <header>
   <div style="display:flex;flex-direction:column;gap:2px;">
     <h1>⦿ JOSEF'S STABILITY CALCULATOR</h1>
@@ -594,8 +598,6 @@
     <span id="theme-label">Light mode</span>
   </div>
 </header>
-
-<main>
 
 <!-- ── 1. INPUT FORM ── -->
 <section>

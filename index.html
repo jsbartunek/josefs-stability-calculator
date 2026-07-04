@@ -1010,7 +1010,9 @@ function applyTheme(theme) {
   }
   localStorage.setItem('bsc-theme', theme);
   // Redraw chart if visible
-  if (atmChart) updateAtmMap();
+  if (typeof atmChart !== 'undefined' && atmChart && typeof lastParams !== 'undefined' && lastParams) {
+    updateAtmMap();
+  }
 }
 
 function toggleTheme() {
@@ -1069,10 +1071,10 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   // G7
   const factor = G1G7[btype];
   let bc_g7_eff, g7_source;
-  if (!factor) {
-    bc_g7_eff = null; g7_source = 'N/A';
-  } else if (bc_g7_in > 0) {
+  if (bc_g7_in > 0) {
     bc_g7_eff = bc_g7_in; g7_source = 'measured';
+  } else if (!factor) {
+    bc_g7_eff = null; g7_source = 'N/A';
   } else {
     bc_g7_eff = bc_g1 / factor; g7_source = 'estimated';
   }
@@ -1336,6 +1338,12 @@ function calculate() {
     press: document.getElementById('press-unit').value,
     caliber: document.getElementById('caliber-unit').value,
   };
+
+  if (D_in <= 0 || L_in <= 0 || m_gr <= 0 || twist_in <= 0 || mv_fps <= 0 || bc_g1 <= 0) {
+    alert('Please enter positive values for caliber, bullet length, weight, twist rate, muzzle velocity and BC G1.');
+    return;
+  }
+
   const r = millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7, btype, tip_in);
   lastParams = { D_in, L_in, m_gr, twist_in, mv_fps, bc_g1, bc_g7, btype, T_C, P_hPa, tip_in };
 
@@ -1494,8 +1502,8 @@ function renderResults(r, units) {
     html += row('Sg (Miller, uncorr.)', '', Sg.toFixed(4), 'muted');
     // Twist corrected: T_corr = T / sqrt(1.15)
     var fbFactor = Math.sqrt(1.15);
-    T_stable_disp = '1:' + (Math.floor(r.T_opt / fbFactor * 100) / 100).toFixed(2) + '"';
-    T_limit_disp  = '1:' + (Math.floor(r.T_min / fbFactor * 100) / 100).toFixed(2) + '"';
+    T_stable_disp = '1:' + (Math.floor(r.T_opt * fbFactor * 100) / 100).toFixed(2) + '"';
+    T_limit_disp  = '1:' + (Math.floor(r.T_min * fbFactor * 100) / 100).toFixed(2) + '"';
   } else if (btype === '3') {
     html += '<div class="sum-row"><span class="sum-key">Sg (RN corrected [3])</span><span></span><span class="sum-val" style="color:var(--muted);font-size:12px;">not applicable — consult manufacturer</span></div>';
     T_stable_disp = '1:' + (Math.floor(r.T_opt * 100) / 100).toFixed(2) + '"';
@@ -1662,6 +1670,13 @@ function updateAtmMap() {
   }, starDataset];
 
 
+  const css = getComputedStyle(document.documentElement);
+  const cSurface = css.getPropertyValue('--surface').trim();
+  const cBorder  = css.getPropertyValue('--border').trim();
+  const cText    = css.getPropertyValue('--text').trim();
+  const cMuted   = css.getPropertyValue('--muted').trim();
+  const cGrid    = css.getPropertyValue('--border2').trim();
+
   const ctx = document.getElementById('atm-chart').getContext('2d');
   if (atmChart) atmChart.destroy();
 
@@ -1682,27 +1697,27 @@ function updateAtmMap() {
               return 'T=' + pt.x.toFixed(1) + (usingF ? '°F' : '°C') + '  P=' + pt.y.toFixed(usingInHg ? 2 : 0) + (usingInHg ? ' inHg' : ' hPa') + '  Sg=' + pt.sg.toFixed(3);
             }
           },
-          backgroundColor: 'var(--surface)',
-          borderColor: 'var(--border)',
+          backgroundColor: cSurface,
+          borderColor: cBorder,
           borderWidth: 1,
-          titleColor: 'var(--text)',
-          bodyColor: 'var(--text)',
+          titleColor: cText,
+          bodyColor: cText,
           bodyFont: { family: 'IBM Plex Mono', size: 11 }
         }
       },
       scales: {
         x: {
-          title: { display: true, text: usingF ? 'Temperature (°F)' : 'Temperature (°C)', color: '#5a6172',
+          title: { display: true, text: usingF ? 'Temperature (°F)' : 'Temperature (°C)', color: cMuted,
                    font: { family: 'IBM Plex Mono', size: 13 } },
-          ticks: { color: '#5a6172', font: { family:'IBM Plex Mono', size:12 } },
-          grid:  { color: '#1e2229' },
+          ticks: { color: cMuted, font: { family:'IBM Plex Mono', size:12 } },
+          grid:  { color: cGrid },
           min: tMinD, max: tMaxD
         },
         y: {
-          title: { display: true, text: 'Pressure (' + pressUnit + ')', color: '#5a6172',
+          title: { display: true, text: 'Pressure (' + pressUnit + ')', color: cMuted,
                    font: { family: 'IBM Plex Mono', size: 13 } },
-          ticks: { color: '#5a6172', font: { family:'IBM Plex Mono', size:12 } },
-          grid:  { color: '#1e2229' },
+          ticks: { color: cMuted, font: { family:'IBM Plex Mono', size:12 } },
+          grid:  { color: cGrid },
           min: pMinD, max: pMaxD
         }
       }
@@ -1787,6 +1802,7 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       © 2026 Josef Ström Bartůněk · Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
+      Last updated: July 3, 2026 (v1.9.1 — Bugfixes: corrected direction of flat-base twist-rate correction (was inverted, recommended faster instead of slower twist); measured G7 BC now honored for flat-base/round-nose bullet types; atmospheric map colors now follow active theme (Chart.js cannot resolve CSS variables); input validation guard against zero values in Calculate.)<br>
       Last updated: April 17, 2026 (v1.9 — Unit-system review: metric defaults across all fields (mm, m/s, °C, hPa), kept gr and in/turn as conventional defaults; added mbar as a synonym for hPa in pressure fields; atmospheric map start range now −20°C to 40°C / 950–1050 hPa; atm map Y-axis title and auto-redraw fixed for mbar/inHg switches; removed redundant "in" suffix on twist results; added footnote [7] on 0% RH assumption. Matches external ballistics app v2.4.) &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
@@ -1812,12 +1828,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Pressure: also enforce reasonable minimum (100 hPa / 3 inHg)
+  // Pressure: invalid/empty falls back to standard atmosphere in the
+  // currently selected unit (1013 hPa/mbar, 29.92 inHg).
   var pressEl = document.getElementById('press');
   if (pressEl) {
     pressEl.addEventListener('blur', function() {
       var v = parseFloat(this.value.replace(',','.'));
-      if (isNaN(v) || v <= 0) this.value = 1013;
+      if (isNaN(v) || v <= 0) {
+        var u = document.getElementById('press-unit').value;
+        this.value = (u === 'inHg') ? 29.92 : 1013;
+      }
     });
   }
 });

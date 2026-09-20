@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-7SXCXHD3KN"></script>
 <script>
@@ -9,18 +11,35 @@
   gtag('js', new Date());
   gtag('config', 'G-7SXCXHD3KN');
 </script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Josef's Stability Calculator — Miller Twist Rule</title>
-<meta name="description" content="Free online bullet stability calculator based on the Miller Twist Rule. Calculate gyroscopic stability factor (Sg), optimal twist rate, BC degradation and spin drift for any bullet and rifle combination.">
+<title>Josef's Bullet Stability Calculator — Miller Twist Rule</title>
+<meta name="description" content="Free bullet stability calculator based on the Miller Twist Rule: gyroscopic stability factor (Sg), optimal twist rate, BC degradation and spin drift.">
+<link rel="canonical" href="https://jsbartunek.github.io/josefs-stability-calculator/">
 <meta name="keywords" content="twist rate calculator, bullet stability, Miller twist rule, gyroscopic stability factor, Sg, handloading, reloading, ballistics, spin drift, BC degradation, rifling twist, barrel twist">
-<meta name="author" content="Josef">
+<meta name="author" content="Josef Ström Bartůněk">
 <meta property="og:title" content="Josef's Stability Calculator">
 <meta property="og:description" content="Free bullet stability calculator based on the Miller Twist Rule. Calculate Sg, optimal twist rate, BC degradation and spin drift.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://jsbartunek.github.io/josefs-stability-calculator/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Josef's Stability Calculator">
 <meta name="twitter:description" content="Free bullet stability calculator based on the Miller Twist Rule. Calculate Sg, optimal twist rate, BC degradation and spin drift.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Josef's Stability Calculator",
+  "alternateName": "Bullet Stability Calculator (Miller Twist Rule)",
+  "url": "https://jsbartunek.github.io/josefs-stability-calculator/",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "description": "Free bullet stability calculator based on the Miller Twist Rule: gyroscopic stability factor (Sg), optimal twist rate, BC degradation and spin drift.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": { "@type": "Person", "name": "Josef Ström Bartůněk" }
+}
+</script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%230d0f12' stroke='%23e8c36a' stroke-width='2'/><circle cx='16' cy='16' r='5' fill='none' stroke='%23e8c36a' stroke-width='2'/><line x1='16' y1='2' x2='16' y2='9' stroke='%23e8c36a' stroke-width='2'/><line x1='16' y1='23' x2='16' y2='30' stroke='%23e8c36a' stroke-width='2'/><line x1='2' y1='16' x2='9' y2='16' stroke='%23e8c36a' stroke-width='2'/><line x1='23' y1='16' x2='30' y2='16' stroke='%23e8c36a' stroke-width='2'/></svg>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -888,6 +907,7 @@ Humidity is assumed to be 0% (dry air, ICAO standard) — see <a href="#fn7" cla
       <div class="f-row"><span class="f-name">BC degradation:</span><span class="f-eq">BC_eff = BC · max(0, 1 − (1.5−Sg)·0.30)  if Sg &lt; 1.5</span></div>
       <div class="f-row"><span class="f-name">G1→G7 estimate <a href="#fn2" class="fn-link">[2]</a>:</span><span class="f-eq">BC_G7 = BC_G1 / 1.95  (all pointed BT types — see [2] below)</span></div>
       <div class="f-row"><span class="f-name">Spin drift:</span><span class="f-eq">drift_inch = 1.25·(Sg+1.2)·TOF^1.83</span></div>
+      <div class="f-row"><span class="f-name">Time of flight:</span><span class="f-eq">point-mass integration, same drag model as transonic distance; current temperature and pressure</span></div>
       <div class="f-row"><span class="f-name">Sg (flat-base <a href="#fn3" class="fn-link">[3]</a>):</span><span class="f-eq">Sg_corrected ≈ Sg × 1.15</span></div>
       <div class="f-row"><span class="f-name">Polymer tip <a href="#fn1" class="fn-link">[1]</a>:</span><span class="f-eq">Sg may be underestimated — use polymer tip field to correct</span></div>
       <div class="f-row"><span class="f-name">Transonic dist. <a href="#fn6" class="fn-link">[6]</a>:</span><span class="f-eq">a = (π/8)·ρv²C<sub>d</sub>(M) / BC<sub>SI</sub>  &nbsp;[Siacci/Ingalls]</span></div>
@@ -962,11 +982,12 @@ function saveInputs() {
     var el = document.getElementById(id);
     if (el) data[id] = el.value;
   });
-  localStorage.setItem('bsc-inputs', JSON.stringify(data));
+  try { localStorage.setItem('bsc-inputs', JSON.stringify(data)); } catch(e) {}
 }
 
 function restoreInputs() {
-  var raw = localStorage.getItem('bsc-inputs');
+  var raw = null;
+  try { raw = localStorage.getItem('bsc-inputs'); } catch(e) {}
   if (!raw) return;
   try {
     var data = JSON.parse(raw);
@@ -992,7 +1013,8 @@ document.addEventListener('DOMContentLoaded', function() {
 //  THEME TOGGLE — light is default
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
-  const saved = localStorage.getItem('bsc-theme') || 'light';
+  let saved = 'light';
+  try { saved = localStorage.getItem('bsc-theme') || 'light'; } catch(e) {}
   applyTheme(saved);
 });
 
@@ -1008,7 +1030,7 @@ function applyTheme(theme) {
     track.classList.remove('on');
     label.textContent = 'Dark mode';
   }
-  localStorage.setItem('bsc-theme', theme);
+  try { localStorage.setItem('bsc-theme', theme); } catch(e) {}
   // Redraw chart if visible
   if (typeof atmChart !== 'undefined' && atmChart && typeof lastParams !== 'undefined' && lastParams) {
     updateAtmMap();
@@ -1046,8 +1068,8 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   const lc    = L / D;
 
   // Courtney–Miller (2012): if polymer tip length provided,
-  // use metal-only length in the (1 + lc²) overturning moment term,
-  // but retain total lc for the leading lc term (mass distribution).
+  // use metal-only length in the (1 + lc²) term (mass distribution / inertia),
+  // but retain total lc for the leading lc term (aerodynamics / centre of pressure).
   // If tip_in = 0, reduces to standard Miller.
   const tip   = (tip_in && tip_in > 0 && tip_in < L) ? tip_in : 0;
   const lc_metal = (L - tip) / D;
@@ -1063,9 +1085,12 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   const f_atm = Math.sqrt((760.0 / P_mmHg) * (T_K / 288.15));
 
   const Sg = Sg_uncorr * fv * f_atm;
+  // Flat-base bullets: the displayed (corrected) Sg = Sg × 1.15 [3] is also the one that
+  // governs BC degradation and spin drift, so that all outputs agree with the headline value.
+  const Sg_eff = (btype === '2') ? Sg * 1.15 : Sg;
 
   // BC effective
-  const bc_eff = Sg >= 1.5 ? bc_g1 : bc_g1 * Math.max(0, 1 - (1.5 - Sg) * 0.30);
+  const bc_eff = Sg_eff >= 1.5 ? bc_g1 : bc_g1 * Math.max(0, 1 - (1.5 - Sg_eff) * 0.30);
   const bc_pct = bc_eff / bc_g1 * 100;
 
   // G7
@@ -1080,7 +1105,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   }
   let bc_g7_korr = null;
   if (bc_g7_eff !== null) {
-    bc_g7_korr = Sg >= 1.5 ? bc_g7_eff : bc_g7_eff * Math.max(0, 1 - (1.5-Sg)*0.30);
+    bc_g7_korr = Sg_eff >= 1.5 ? bc_g7_eff : bc_g7_eff * Math.max(0, 1 - (1.5-Sg_eff)*0.30);
   }
 
   // Stable/Minimum twist
@@ -1092,17 +1117,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   // Sectional density
   const SD = m_gr / (D*D * 7000);
 
-  // Spin drift table: 0..600 m in 50 m steps
-  // Uses G7 BC for TOF if available (more accurate for boattails), otherwise G1
   const v0_ms = mv_fps_val * 0.3048;
-  const use_g7_tof = bc_g7_eff !== null && bc_g7_eff > 0;
-  const retard = use_g7_tof ? (bc_g7_eff * 28800) : (bc_g1 * 17500);
-  const dist_m_arr = [0,50,100,150,200,250,300,350,400,450,500,550,600];
-  const drift = dist_m_arr.map(dm => {
-    const tof = (retard/v0_ms) * (Math.exp(dm/retard) - 1);
-    const drift_inch = 1.25 * (Sg + 1.2) * Math.pow(tof, 1.83);
-    return { dm, tof, drift_inch, drift_mm: drift_inch*25.4 };
-  });
 
   // ── Transonic distance — point-mass retardation model ──
   // Uses Gehtsoft G1 Cd(M) table with π/8 (Siacci/Ingalls) normalization.
@@ -1181,6 +1196,43 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
     }
     return x;
   }
+
+  // Time of flight to each distance — point-mass integration with the same
+  // Cd(M) tables and π/8 normalization as calcTransonic (flat-fire, drag only).
+  function calcTofTable(v0_ms, bc_val, isG7, T_C, P_hPa, dists) {
+    const DRAG_COEFF = Math.PI / 8;
+    const T_K = T_C + 273.15;
+    const rho = 1.225 * (P_hPa / 1013.25) * (288.15 / T_K);
+    const vs  = 331.3 * Math.sqrt(T_K / 273.15);
+    const BC_SI = bc_val * 703.07;
+    const dt = 0.0005;
+    const out = dists.map(() => NaN);
+    let v = v0_ms, x = 0, t = 0, k = 0;
+    while (k < dists.length && dists[k] <= 0) { out[k] = 0; k++; }
+    while (k < dists.length && t < 10 && v > 30) {
+      const a_drag = DRAG_COEFF * rho * v * v * interpCd(v / vs, isG7) / BC_SI;
+      const x0 = x, t0 = t;
+      v -= a_drag * dt;
+      x += v * dt;
+      t += dt;
+      while (k < dists.length && x >= dists[k]) {
+        out[k] = t0 + (dists[k] - x0) / (x - x0) * dt;
+        k++;
+      }
+    }
+    return out;
+  }
+
+  // Spin drift table: 0..600 m in 50 m steps (Litz: 1.25·(Sg+1.2)·TOF^1.83)
+  // Uses rated G7 BC for TOF if available (more accurate for boattails), otherwise rated G1
+  const use_g7_tof = bc_g7_eff !== null && bc_g7_eff > 0;
+  const dist_m_arr = [0,50,100,150,200,250,300,350,400,450,500,550,600];
+  const tof_arr = calcTofTable(v0_ms, use_g7_tof ? bc_g7_eff : bc_g1, use_g7_tof, T_C, P_hPa, dist_m_arr);
+  const drift = dist_m_arr.map((dm, i) => {
+    const tof = tof_arr[i];
+    const drift_inch = 1.25 * (Sg_eff + 1.2) * Math.pow(tof, 1.83);
+    return { dm, tof, drift_inch, drift_mm: drift_inch*25.4 };
+  });
 
   const use_g7  = bc_g7_eff !== null && bc_g7_eff > 0;
   const bc_tran = use_g7 ? (bc_g7_korr !== null ? bc_g7_korr : bc_g7_eff) : bc_eff;
@@ -1422,7 +1474,6 @@ function renderResults(r, units) {
   const g7src   = r.bc_g7_eff  !== null ? r.g7_source : '';
   const g7pct   = r.bc_g7_korr !== null ? (r.bc_g7_korr/r.bc_g7_eff*100).toFixed(1)+'%' : '';
 
-  const stableStatus  = Sg >= 1.5 ? 'Achieved' : 'Not achieved with selected twist';
   const transonicStr  = r.transonic_m >= 5000
     ? '> 5000 m / > 5468 yd (' + r.transonic_src + ')'
     : r.transonic_m > 0
@@ -1470,7 +1521,7 @@ function renderResults(r, units) {
     + '<i>fv</i> = (v/2800)^(1/3)<br>'
     + '<i>f_atm</i> = √(760/P × T/288.15)<br><br>'
     + (r.courtney
-        ? '<span style="color:var(--accent);">Courtney–Miller (2012) active:</span> metal-only length used in (1+l²) term — polymer tip excluded from overturning moment.'
+        ? '<span style="color:var(--accent);">Courtney–Miller (2012) active:</span> metal-only length used in the (1+l²) term — the light polymer tip is excluded from the mass-distribution term, while the full length is kept for the aerodynamic term.'
         : 'Polymer tip length = 0: standard Miller formula using full bullet length (conservative for polymer-tipped bullets). See [1] below.')
     + '</div></button>';
   var sgLabel = r.courtney ? 'Sg (Courtney–Miller [1])' : 'Sg';
@@ -1568,12 +1619,13 @@ function renderDriftTable(drift) {
   const tb = document.getElementById('drift-tbody');
   tb.innerHTML = drift.map(d => {
     const yd   = (d.dm * 1.09361).toFixed(0);
-    const moa  = d.dm > 0 ? (d.drift_inch / (d.dm*1.09361/100)).toFixed(2) : '—';
+    const reached = !isNaN(d.drift_inch);
+    const moa  = (d.dm > 0 && reached) ? (d.drift_inch / (d.dm*1.09361/100) / 1.0472).toFixed(2) : '—';
     return '<tr>'
       + '<td>' + d.dm + '</td>'
-      + '<td style="border-right:2px solid var(--border2);">' + d.drift_mm.toFixed(1) + '</td>'
+      + '<td style="border-right:2px solid var(--border2);">' + (reached ? d.drift_mm.toFixed(1) : '—') + '</td>'
       + '<td>' + yd + '</td>'
-      + '<td style="border-right:2px solid var(--border2);">' + d.drift_inch.toFixed(2) + '</td>'
+      + '<td style="border-right:2px solid var(--border2);">' + (reached ? d.drift_inch.toFixed(2) : '—') + '</td>'
       + '<td>' + moa + '</td>'
       + '</tr>';
   }).join('');
@@ -1802,8 +1854,16 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       © 2026 Josef Ström Bartůněk · Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      Last updated: July 3, 2026 (v1.9.1 — Bugfixes: corrected direction of flat-base twist-rate correction (was inverted, recommended faster instead of slower twist); measured G7 BC now honored for flat-base/round-nose bullet types; atmospheric map colors now follow active theme (Chart.js cannot resolve CSS variables); input validation guard against zero values in Calculate.)<br>
-      Last updated: April 17, 2026 (v1.9 — Unit-system review: metric defaults across all fields (mm, m/s, °C, hPa), kept gr and in/turn as conventional defaults; added mbar as a synonym for hPa in pressure fields; atmospheric map start range now −20°C to 40°C / 950–1050 hPa; atm map Y-axis title and auto-redraw fixed for mbar/inHg switches; removed redundant "in" suffix on twist results; added footnote [7] on 0% RH assumption. Matches external ballistics app v2.4.) &nbsp;·&nbsp;
+      <span style="margin-top:4px;display:inline-block">v2.0 · Sep 20, 2026 — spin drift now uses a full point-mass time of flight (values increase, most at long range); MOA column corrected; flat-base correction applied consistently.</span>
+      <details style="display:inline-block;margin-left:6px;cursor:pointer">
+        <summary style="display:inline;color:var(--accent2);text-decoration:none;list-style:none">Changelog ▾</summary>
+        <div style="margin-top:6px;padding:8px 12px;background:var(--bg);border-left:2px solid var(--border);line-height:1.7">
+          <b>v2.0</b> (Sep 20, 2026) — Spin drift: time of flight now comes from the same point-mass drag model as the transonic distance, at the entered temperature and pressure (the earlier approximation gave too short flight times, so drift values are now higher, about +15% at 200 m and +50% at 600 m); MOA column shows true MOA (was inches per 100 yd); flat-base correction now also applies to BC degradation, transonic distance and spin drift; page works with blocked browser storage; tooltips no longer flicker.<br>
+          <b>v1.9.1</b> (Jul 3, 2026) — Flat-base twist correction direction fixed; measured G7 BC honoured for all bullet types; atmospheric map follows the active theme.<br>
+          <b>v1.9</b> (Apr 17, 2026) — Unit review: metric defaults, mbar added, atmospheric map range and axis fixes, footnote [7] on the 0% RH assumption.
+        </div>
+      </details>
+      &nbsp;·&nbsp;
       <a href="https://github.com/jsbartunek/josefs-stability-calculator/issues" target="_blank" style="color:var(--accent2);text-decoration:none;">Report a bug or ask a question ↗</a>
     </div>
   </div>
@@ -1909,12 +1969,14 @@ document.addEventListener('keydown', function(e) {
   document.addEventListener('mouseover', function(e) {
     var btn = e.target.closest('.tip-btn');
     if (!btn) return;
+    if (btn === activeBtn || (e.relatedTarget && btn.contains(e.relatedTarget))) return; // moving inside the same tip
     clearTimeout(openTimer);
     openTimer = setTimeout(function() { showTip(btn); }, 400);
   });
   document.addEventListener('mouseout', function(e) {
     var btn = e.target.closest('.tip-btn');
     if (!btn) return;
+    if (e.relatedTarget && btn.contains(e.relatedTarget)) return; // still inside button / tip box
     clearTimeout(openTimer);
     hideTip(btn);
   });

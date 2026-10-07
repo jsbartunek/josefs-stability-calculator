@@ -942,7 +942,7 @@ Humidity is assumed to be 0% (dry air, ICAO standard) — see <a href="#fn7" cla
       <br><br>
       <span id="fn5" style="font-size:12px;">[5] <strong>High stability (Sg ≥ 2.0):</strong> Whether high Sg causes practical problems is debated. Lapua and traditional sources recommend keeping Sg below 2.0, citing increased drag from nose-up flight and sensitivity to bullet imperfections. Berger/Litz counter that Doppler radar data shows higher Sg actually reduces drag, especially in the transonic region — the nose-up myth originates from high-angle artillery fire, not small arms ballistics. In practice, Sg 1.4–2.0 is the broadly agreed optimal window. Values above 2.0 are generally still accurate but represent an unnecessarily fast twist for the bullet used.</span>
       <br><br>
-      <span id="fn6" style="font-size:12px;">[6] <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft G1 C<sub>d</sub>(M) tables (79 points) and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. G7 BC is used when available (recommended for boattail bullets); G1 BC is used as fallback. The transonic threshold is set at Mach 1.2 (~408 m/s at ISA) — the onset of the transonic region. Miller's formula assumes the aerodynamic pitching moment scales predictably with velocity, but this assumption breaks down as drag rises rapidly and non-linearly through the transonic region. While Miller produces numerical output down to Mach 1.0 and below, its predictive value degrades progressively from Mach ≈ 1.2. Beyond this range actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
+      <span id="fn6" style="font-size:12px;">[6] <strong>Transonic distance:</strong> Calculated using a point-mass drag model with Gehtsoft/BRL C<sub>d</sub>(M) tables — G7 (85 points) or G1 (79 points) — and π/8 (Siacci/Ingalls) normalization — validated against JBM Ballistics and Norma factory data, no empirical correction factors. The model integrates velocity loss in 1 ms steps using actual atmospheric conditions. The G7 model is used whenever a G7 BC is available: either entered directly or, for pointed boat-tail bullets, estimated from G1 (BC<sub>G1</sub>/1.95, see <a href="#fn2" class="fn-link">[2]</a>); the result is then marked “G7 est.”. The G1 model is used only for flat-base and round-nose bullets without an entered G7 BC. The effective (stability-corrected) BC is used, so marginal stability (S<sub>g</sub> &lt; 1.5) also shortens the transonic distance. The transonic threshold is set at Mach 1.2 (~408 m/s at ISA) — the onset of the transonic region. Miller's formula assumes the aerodynamic pitching moment scales predictably with velocity, but this assumption breaks down as drag rises rapidly and non-linearly through the transonic region. While Miller produces numerical output down to Mach 1.0 and below, its predictive value degrades progressively from Mach ≈ 1.2. Beyond this range actual stability depends on dynamic stability (S<sub>d</sub>) — factors not modelled here.</span>
       <br><br>
       <span id="fn7" style="font-size:12px;">[7] <strong>Humidity assumption (0% RH):</strong> The atmospheric correction <code>f_atm = √((760/P) · (T_K/288.15))</code> compares measured conditions against the ICAO International Standard Atmosphere, which is defined for <em>dry air</em> (ρ = 1.225 kg/m³ at 15 °C / 1013.25 hPa). Humidity is therefore implicitly assumed to be 0%. This is a deliberate simplification: dry air is slightly denser than humid air (water vapour M = 18 g/mol vs air M = 29 g/mol), so assuming dry conditions produces a marginally higher drag estimate and therefore a marginally lower S<sub>g</sub> — i.e. the result is conservative. The magnitude is bounded: the full 0% → 100% RH range at 15 °C / 1013 hPa reduces air density by about 0.6%, corresponding to a S<sub>g</sub> shift of roughly 0.005–0.01 — well within the precision of the input parameters. For trajectory-level humidity handling (Tetens saturation vapour pressure), see the companion <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);">External Ballistics</a> calculator.</span>
     </div>
@@ -1120,9 +1120,10 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   const v0_ms = mv_fps_val * 0.3048;
 
   // ── Transonic distance — point-mass retardation model ──
-  // Uses Gehtsoft G1 Cd(M) table with π/8 (Siacci/Ingalls) normalization.
+  // Uses Gehtsoft/BRL Cd(M) tables (G7 85 pts / G1 79 pts) with π/8 (Siacci/Ingalls) normalization.
   // Validated against JBM Ballistics and Norma factory data. No empirical correction factors.
-  // G7 BC used when available, G1 as fallback.
+  // G7 model whenever a G7 BC exists (entered, or estimated from G1 for pointed boat-tail);
+  // G1 model only for flat base / round nose without entered G7. Effective (Sg-corrected) BC is used.
 
   // Cd tables (Gehtsoft G1 — 79 points, Siacci/Ingalls normalization)
   const G1_MACH = [0.00,0.05,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,
@@ -1238,7 +1239,7 @@ function millerCalc(D_in, L_in, m_gr, twist_in, mv_fps, T_C, P_hPa, bc_g1, bc_g7
   const bc_tran = use_g7 ? (bc_g7_korr !== null ? bc_g7_korr : bc_g7_eff) : bc_eff;
   const transonic_m   = calcTransonic(v0_ms, bc_tran, use_g7, T_C, P_hPa);
   const transonic_yd  = transonic_m * 1.09361;
-  const transonic_src = use_g7 ? 'G7' : 'G1';
+  const transonic_src = use_g7 ? (g7_source === 'estimated' ? 'G7 est.' : 'G7') : 'G1';
 
   return { D, lc, lc_metal, courtney, t_cal, Sg_uncorr, fv, f_atm, Sg, bc_eff, bc_pct,
            bc_g7_eff, bc_g7_korr, g7_source, T_opt, T_min, SD, drift,
@@ -1854,10 +1855,11 @@ function drawIsoLine(ctx, xs, ys, ca, temps, press, heatData, nT, nP, level, col
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9;">
       © 2026 Josef Ström Bartůněk · Companion to <a href="https://jsbartunek.github.io/josefs-external-ballistics/" target="_blank" style="color:var(--accent2);text-decoration:none;">Josef's External Ballistics Calculator</a> · Open source · GitHub Pages<br>
-      <span style="margin-top:4px;display:inline-block">v2.0.1 · Sep 20, 2026 — spin drift now uses a full point-mass time of flight (values increase, most at long range); MOA column corrected; flat-base correction applied consistently.</span>
+      <span style="margin-top:4px;display:inline-block">v2.0.2 · Oct 7, 2026 — transonic result now marks an estimated G7 BC; footnote [6] clarified. Since v2.0: spin drift uses a full point-mass time of flight (values increase, most at long range).</span>
       <details style="display:inline-block;margin-left:6px;cursor:pointer">
         <summary style="display:inline;color:var(--accent2);text-decoration:none;list-style:none">Changelog ▾</summary>
         <div style="margin-top:6px;padding:8px 12px;background:var(--bg);border-left:2px solid var(--border);line-height:1.7">
+          <b>v2.0.2</b> (Oct 7, 2026) — Transonic distance labelled “G7 est.” when the G7 BC is estimated from G1; footnote [6] now describes which drag model and BC are used (no change to calculated values).<br>
           <b>v2.0.1</b> (Sep 20, 2026) — Links to the JBM online calculators removed (retired in 2026); the validation against JBM stands.<br>
           <b>v2.0</b> (Sep 20, 2026) — Spin drift: time of flight now comes from the same point-mass drag model as the transonic distance, at the entered temperature and pressure (the earlier approximation gave too short flight times, so drift values are now higher, about +15% at 200 m and +50% at 600 m); MOA column shows true MOA (was inches per 100 yd); flat-base correction now also applies to BC degradation, transonic distance and spin drift; page works with blocked browser storage; tooltips no longer flicker.<br>
           <b>v1.9.1</b> (Jul 3, 2026) — Flat-base twist correction direction fixed; measured G7 BC honoured for all bullet types; atmospheric map follows the active theme.<br>
